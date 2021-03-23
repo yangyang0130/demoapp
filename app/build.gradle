@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.application'
+}
+apply from: '../config.gradle'
+
+android {
+
+    defaultConfig {
+        applicationId "com.yangyang.unmanneddrone"
+
+        //
+
+
+    }
+
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDir 'libs'
+        }
+    }
+
+}
+
+dependencies {
+    // 引入工具包
+    implementation project(':tools')
+
+    // 图片加载框架：https://github.com/bumptech/glide
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    // 百度地图依赖包
+
+
+
+}

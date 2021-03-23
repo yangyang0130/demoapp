@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <com.baidu.mapapi.map.MapView
+                android:id="@+id/mv_map"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/ib_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="10dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_location"
+                android:padding="10dp"
+                android:src="@mipmap/ib_location" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_arrow_map"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/bg_map_direction"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/left" />
+
+        </RelativeLayout>
+
+        <include
+            layout="@layout/aty_create_more"/>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

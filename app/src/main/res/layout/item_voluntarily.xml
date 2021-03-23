@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="10dp"
+    android:background="@drawable/bg_context"
+    android:layout_margin="10dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_map"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@drawable/bg_pull"
+        android:src="@mipmap/map"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@+id/iv_map"
+        android:text="谢家湾飞行"
+        android:textColor="#000000"
+        android:textSize="15sp"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_update_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/iv_map"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="40dp"
+        android:layout_toRightOf="@+id/iv_map"
+        android:text="更新时间：3/18/2021"
+        android:textColor="#616161"
+        android:textSize="12sp"/>
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/iv_map"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_toRightOf="@+id/iv_map"
+        android:text="重庆市南岸区谢家湾轻轨站"
+        android:textColor="#616161"
+        android:textSize="12sp"/>
+</RelativeLayout>
