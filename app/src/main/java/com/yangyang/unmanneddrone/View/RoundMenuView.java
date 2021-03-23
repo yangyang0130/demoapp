@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.yangyang.unmanneddrone.R;
+import com.yangyang.unmanneddrone.helper.AnimationHelper;
+import com.yangyang.unmanneddrone.helper.Constants;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,11 +53,11 @@ public class RoundMenuView extends View {
     private Toast toast;
     private String clickEvent;
 
-    public void setClickEvent(String clickEvent){
+    public void setClickEvent(String clickEvent) {
         this.clickEvent = clickEvent;
     }
 
-    public String getClickEvent(){
+    public String getClickEvent() {
         return clickEvent;
     }
 
@@ -188,6 +190,7 @@ public class RoundMenuView extends View {
             }
         }
     }
+
     public boolean onTouchEvent(MotionEvent event) {
         OnClickListener onClickListener = null;
         switch (event.getAction()) {
@@ -212,7 +215,7 @@ public class RoundMenuView extends View {
                     //点击了外面
                     onClickState = -2;
                 }
-                if (onClickListener != null){
+                if (onClickListener != null) {
                     clickEvent = "down";
                     onClickListener.onClick(this);
                 }
@@ -236,6 +239,7 @@ public class RoundMenuView extends View {
         }
         return true;
     }
+
     /**
      * 添加菜单
      *
@@ -348,8 +352,11 @@ public class RoundMenuView extends View {
         return (int) (0.5f + dpValue * Resources.getSystem().getDisplayMetrics().density);
     }
 
-    private void initView() {
+    /**
+     * 点击事件方向定义
+     */
 
+    private void initView() {
         RoundMenuView.RoundMenu roundMenu = new RoundMenuView.RoundMenu();
         roundMenu.selectSolidColor = Color.GRAY;
         roundMenu.icon = drawable2Bitmap(getResources().getDrawable(R.mipmap.right));
@@ -357,7 +364,7 @@ public class RoundMenuView extends View {
         roundMenu.onClickListener = new OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                mOnClickListener.onViewClick((RoundMenuView) view, Constants.getInstance().Click_DOWN_ARROW);
             }
         };
         addRoundMenu(roundMenu);
@@ -369,7 +376,7 @@ public class RoundMenuView extends View {
         roundMenu.onClickListener = new OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                mOnClickListener.onViewClick((RoundMenuView) view, Constants.getInstance().Click_LEFT_ARROW);
             }
         };
         addRoundMenu(roundMenu);
@@ -381,7 +388,7 @@ public class RoundMenuView extends View {
         roundMenu.onClickListener = new OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                mOnClickListener.onViewClick((RoundMenuView) view, Constants.getInstance().Click_UP_ARROW);
             }
         };
         addRoundMenu(roundMenu);
@@ -393,16 +400,17 @@ public class RoundMenuView extends View {
         roundMenu.onClickListener = new OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                mOnClickListener.onViewClick((RoundMenuView) view, Constants.getInstance().Click_RIGHT_ARROW);
             }
         };
         addRoundMenu(roundMenu);
 
         setCoreMenu(Color.parseColor("#FFFFFFFF"), Color.parseColor("#FFFFFFFF"), Color.parseColor("#FFBFC0C2")
-                ,2,0.33, drawable2Bitmap(getResources().getDrawable(R.drawable.shape_dian)), new OnClickListener() {
+                , 2, 0.33, drawable2Bitmap(getResources().getDrawable(R.drawable.shape_dian)), new OnClickListener() {
                     @Override
                     public void onClick(View view) {
-//                    Toast.makeText(PreviewActivity.this, "点击了中心圆圈", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(PreviewActivity.this, "点击了中心圆圈", Toast.LENGTH_SHORT).show();d
+                        mOnClickListener.onViewClick((RoundMenuView) view, Constants.getInstance().Click_CENTER_ARROW);
                     }
                 });
     }
@@ -439,6 +447,7 @@ public class RoundMenuView extends View {
         drawable.draw(canvas);
         return bitmap;
     }
+
     /**
      * Drawable to bitmap.
      *
@@ -456,5 +465,16 @@ public class RoundMenuView extends View {
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
         return bitmap;
+    }
+
+
+    public interface OnViewClickListener {
+        void onViewClick(RoundMenuView roundMenuView, int arrow);
+    }
+
+    private OnViewClickListener mOnClickListener;
+
+    public void setmOnClickListener(OnViewClickListener mOnClickListener) {
+        this.mOnClickListener = mOnClickListener;
     }
 }

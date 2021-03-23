@@ -102,10 +102,12 @@
                     android:layout_marginBottom="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/edit_background"
+                    android:inputType="numberDecimal"
+                    android:maxLength="12"
                     android:maxLines="1"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:text="106.21324"
+                    android:singleLine="true"
                     android:textColor="#03A9F4"
                     android:textSize="11sp">
 
@@ -134,10 +136,12 @@
                     android:layout_marginBottom="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/edit_background"
+                    android:inputType="numberDecimal"
+                    android:maxLength="12"
                     android:maxLines="1"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:text="29.234242"
+                    android:singleLine="true"
                     android:textColor="#03A9F4"
                     android:textSize="11sp">
 
@@ -151,10 +155,10 @@
                 android:layout_weight="1">
 
                 <com.yangyang.unmanneddrone.View.RoundMenuView
-                    android:layout_width="120dp"
                     android:id="@+id/roundView_one"
+                    android:layout_width="120dp"
                     android:layout_height="120dp"
-                    android:layout_centerInParent="true"/>
+                    android:layout_centerInParent="true" />
             </RelativeLayout>
         </LinearLayout>
 
@@ -199,12 +203,14 @@
                     android:layout_marginBottom="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/edit_background"
+                    android:inputType="numberDecimal"
+                    android:maxLength="12"
                     android:maxLines="1"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:text="106.21324"
+                    android:singleLine="true"
                     android:textColor="#03A9F4"
-                    android:textSize="11sp"></EditText>
+                    android:textSize="11sp" />
 
                 <TextView
                     android:id="@+id/tv_end_Longitude"
@@ -229,14 +235,14 @@
                     android:layout_marginBottom="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/edit_background"
+                    android:inputType="numberDecimal"
+                    android:maxLength="12"
                     android:maxLines="1"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:text="29.234242"
+                    android:singleLine="true"
                     android:textColor="#03A9F4"
-                    android:textSize="11sp">
-
-                </EditText>
+                    android:textSize="11sp" />
 
             </LinearLayout>
 

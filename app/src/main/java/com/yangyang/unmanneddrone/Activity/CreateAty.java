@@ -2,23 +2,23 @@ package com.yangyang.unmanneddrone.Activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.ZoomControls;
 
-import androidx.annotation.BoolRes;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.baidu.location.BDLocation;
@@ -35,46 +35,77 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.Overlay;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.search.geocode.GeoCodeResult;
-import com.baidu.mapapi.search.geocode.GeoCoder;
-import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
-import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
-import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.yangyang.unmanneddrone.R;
+import com.yangyang.unmanneddrone.View.RoundMenuView;
 import com.yangyang.unmanneddrone.base.MyActivity;
-import com.yangyang.unmanneddrone.helper.AnimationHelper;
+import com.yangyang.unmanneddrone.helper.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateAty extends MyActivity implements
-        View.OnClickListener, View.OnTouchListener {
+public class CreateAty extends MyActivity
+        implements View.OnClickListener, View.OnTouchListener,
+        RoundMenuView.OnViewClickListener, BaiduMap.OnMapClickListener {
 
-    private MapView mMapView;     // 定义百度地图组件
+    /**
+     * 选择的轮盘 默认选择起点
+     * 1; 起点位置
+     * 2： 终点位置
+     */
+    private int Wheel_FLAG = 0x001;
+    // 设置微调 的间距，默认为0.01
+    private final double SPACE_SCROLL_SIZE = 0.0001;
+    /**
+     * 百度SDK 定义 start
+     */
     private BaiduMap mBaiduMap;   // 定义百度地图对象
     private LocationClient mLocationClient;  //定义LocationClient
     private boolean isFirstLoc = true;  //定义第一次启动
     private MyLocationConfiguration.LocationMode mCurrentMode;  //定义当前定位模式
     private LatLng latLng;
+    /**
+     * 百度SDK 定义 end
+     */
+
+    /**
+     * xml控件View定义 start
+     */
+    private MapView mMapView;     // 定义百度地图组件
     private ImageView arrowMapView;
     //轮盘按钮
-    private View roundView_one;
-    private View roundView_two;
+    private RoundMenuView roundView_one;
+    private RoundMenuView roundView_two;
     private LinearLayout drawerRootView;
     private ViewFlipper viewFlipper;
-    private BitmapDescriptor bitmap;
-    private String address = "";
-
-    //当前UI界面在父控件的起点X坐标
-    private int maxX;
-    //当前UI界面在父控件的终点X坐标
-    private int minX;
+    /**
+     * xml控件View定义 end
+     */
     //动画
     Animation leftInAnimation;
     Animation leftOutAnimation;
     Animation rightInAnimation;
     Animation rightOutAnimation;
+    //手势滑动
+    private float downX;    //按下时 的X坐标
+    private float downY;    //按下时 的Y坐标
+
+    /**
+     * 设置marker
+     */
+    private int lastLocationIcon;
+    //
+    private OverlayOptions startOption = null;
+    private OverlayOptions endOption = null;
+    private boolean endExitsFlag = false;
+
+    private EditText startLatView;
+    private EditText startLngView;
+    private EditText endLatView;
+    private EditText endLngView;
 
     @Override
     protected void onCreate(@Nullable Bundle bundle) {
@@ -82,11 +113,8 @@ public class CreateAty extends MyActivity implements
         setContentView(R.layout.aty_create);
         initView();
         setInit();
-//        setMapMarker();
-
 
     }
-
 
     @SuppressLint("ClickableViewAccessibility")
     private void initView() {
@@ -100,8 +128,11 @@ public class CreateAty extends MyActivity implements
 
         ///others
         arrowMapView = findViewById(R.id.iv_arrow_map);
-        //
-        // arrowMapView.setRotation();
+        startLatView = findViewById(R.id.et_start_Latitude);
+        startLngView = findViewById(R.id.et_start_Longitude);
+
+        endLatView = findViewById(R.id.et_end_Latitude);
+        endLngView = findViewById(R.id.et_end_Longitude);
 
         drawerRootView = findViewById(R.id.ll_drawer_root);
         viewFlipper = findViewById(R.id.viewFlipper);
@@ -112,8 +143,8 @@ public class CreateAty extends MyActivity implements
         rightInAnimation = AnimationUtils.loadAnimation(this, R.anim.right_in);
         rightOutAnimation = AnimationUtils.loadAnimation(this, R.anim.right_out);
 
-        minX = drawerRootView.getMinimumWidth();
-
+        roundView_one.setmOnClickListener(this);
+        roundView_two.setmOnClickListener(this);
     }
 
     private void setInit() {
@@ -124,12 +155,16 @@ public class CreateAty extends MyActivity implements
         mLocationClient = new LocationClient(this);  //创建LocationClient类
         mLocationClient.registerLocationListener(new MyLocationListener());   //注册监听函数
         initLocation();  //调用initLocation()方法，实现初始化定位
+
+        initKeyBoardListener();
+
     }
 
     private void initLocation() {  //该方法实现初始化定位
         //创建LocationClientOption对象，用于设置定位方式
         LocationClientOption option = new LocationClientOption();
         option.setCoorType("bd09ll");  //设置坐标类型
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         option.setScanSpan(1000);      //1秒定位一次
         option.setOpenGps(true);      //打开GPS
         mLocationClient.setLocOption(option);  //保存定位参数与信息
@@ -143,6 +178,11 @@ public class CreateAty extends MyActivity implements
         // 开启定位
         mBaiduMap.setMyLocationEnabled(true);
         mLocationClient.start();
+
+        /*
+        初始化定位事件
+         */
+        mBaiduMap.setOnMapClickListener(this);
     }
 
     @Override
@@ -188,11 +228,6 @@ public class CreateAty extends MyActivity implements
                 break;
         }
     }
-
-    //手势滑动
-    private float downX;    //按下时 的X坐标
-    private float downY;    //按下时 的Y坐标
-
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -284,6 +319,125 @@ public class CreateAty extends MyActivity implements
         }
     }
 
+    @Override
+    public void onViewClick(RoundMenuView roundMenuView, int arrow) {
+        // 第一个轮盘
+        if (roundMenuView == roundView_one) {
+            Wheel_FLAG = 1;
+            if (arrow == Constants.getInstance().Click_CENTER_ARROW) {
+                //setMarker(currentLatSize, currentLngSize, R.mipmap.first);
+                // 替换为起点的图标
+                setMarker(true, currentStartLatSize, currentStartLngSize, R.mipmap.first);
+                Wheel_FLAG = 2;
+            } else if (arrow == Constants.getInstance().Click_RIGHT_ARROW) {
+                //edittext
+                currentStartLngSize += SPACE_SCROLL_SIZE;
+                startLngView.setText(String.valueOf(currentStartLngSize));
+                // 绘制地图
+                setMarker(false, currentStartLatSize, currentStartLngSize, R.mipmap.first);
+            } else if (arrow == Constants.getInstance().Click_UP_ARROW) {
+                currentStartLatSize += SPACE_SCROLL_SIZE;
+                startLatView.setText(String.valueOf(currentStartLatSize));
+                setMarker(false, currentStartLatSize, currentStartLngSize, R.mipmap.first);
+            } else if (arrow == Constants.getInstance().Click_LEFT_ARROW) {
+                currentStartLngSize -= SPACE_SCROLL_SIZE;
+                startLngView.setText(String.valueOf(currentStartLngSize));
+                setMarker(false, currentStartLatSize, currentStartLngSize, R.mipmap.first);
+            } else if (arrow == Constants.getInstance().Click_DOWN_ARROW) {
+                currentStartLatSize -= SPACE_SCROLL_SIZE;
+                startLatView.setText(String.valueOf(currentStartLatSize));
+                setMarker(false, currentStartLatSize, currentStartLngSize, R.mipmap.first);
+            } else {
+                throw new RuntimeException("This is a error");
+            }
+        }
+        // 第二个轮盘
+        else if (roundMenuView == roundView_two) {
+            Wheel_FLAG = 2;
+            if (arrow == Constants.getInstance().Click_CENTER_ARROW) {
+                setMarker(true, currentEndLatSize, currentEdnLngSize, R.mipmap.end);
+                // PolylineOptions
+                if (TextUtils.isEmpty(startLatView.getText().toString())
+                        || TextUtils.isEmpty(startLngView.getText().toString())
+                        || TextUtils.isEmpty(endLatView.getText().toString())
+                        || TextUtils.isEmpty(endLngView.getText().toString())) {
+                    Toast.makeText(this, "请核对起始点坐标", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                //起点
+                LatLng startLatLng = new LatLng(Double.parseDouble(startLatView.getText().toString()),
+                        Double.parseDouble(startLngView.getText().toString()));
+                // 终点
+                LatLng endLatLng = new LatLng(Double.parseDouble(endLatView.getText().toString()),
+                        Double.parseDouble(endLngView.getText().toString()));
+                List<LatLng> lineList = new ArrayList<LatLng>();
+                lineList.add(startLatLng);
+                lineList.add(endLatLng);
+                //设置折线的属性
+                OverlayOptions mOverlayOptions = new PolylineOptions()
+                        .width(10)
+                        .color(0xAAFF0000)
+                        .points(lineList);
+                //在地图上绘制折线
+                //mPloyline 折线对象
+                Overlay mPolyline = mBaiduMap.addOverlay(mOverlayOptions);
+            } else if (arrow == Constants.getInstance().Click_RIGHT_ARROW) {
+                currentEdnLngSize += SPACE_SCROLL_SIZE;
+                endLngView.setText(String.valueOf(currentEdnLngSize));
+                // 绘制地图
+                setMarker(false, currentEndLatSize, currentEdnLngSize, R.mipmap.end);
+            } else if (arrow == Constants.getInstance().Click_UP_ARROW) {
+                currentEndLatSize += SPACE_SCROLL_SIZE;
+                endLatView.setText(String.valueOf(currentEndLatSize));
+                setMarker(false, currentEndLatSize, currentEdnLngSize, R.mipmap.end);
+            } else if (arrow == Constants.getInstance().Click_LEFT_ARROW) {
+                currentEdnLngSize -= SPACE_SCROLL_SIZE;
+                endLngView.setText(String.valueOf(currentEdnLngSize));
+                setMarker(false, currentEndLatSize, currentEdnLngSize, R.mipmap.end);
+            } else if (arrow == Constants.getInstance().Click_DOWN_ARROW) {
+                currentEndLatSize -= SPACE_SCROLL_SIZE;
+                endLatView.setText(String.valueOf(currentEndLatSize));
+                setMarker(false, currentEndLatSize, currentEdnLngSize, R.mipmap.end);
+            } else {
+                throw new RuntimeException("This is a error");
+            }
+        }
+    }
+
+    private double currentStartLatSize = 0;
+    private double currentStartLngSize = 0;
+    private double currentEndLatSize = 0;
+    private double currentEdnLngSize = 0;
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        // 地图点击
+        Log.d(TAG, "---点击的经纬度-->" + latLng.latitude + "----------" + latLng.longitude);
+        switch (Wheel_FLAG) {
+            case 1: // 点击了起点
+                currentStartLatSize = latLng.latitude;
+                currentStartLngSize = latLng.longitude;
+                setMarker(true, currentStartLatSize, currentStartLngSize, R.mipmap.first);
+                startLatView.setText(String.valueOf(latLng.latitude));
+                startLngView.setText(String.valueOf(latLng.longitude));
+                break;
+            case 2:     // 点击了终点
+                currentEndLatSize = latLng.latitude;
+                currentEdnLngSize = latLng.longitude;
+                setMarker(true, currentEndLatSize, currentEdnLngSize, R.mipmap.end);
+                endLatView.setText(String.valueOf(latLng.latitude));
+                endLngView.setText(String.valueOf(latLng.longitude));
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onMapPoiClick(MapPoi mapPoi) {
+        // poi
+    }
+
     //设置定位监听器
     public class MyLocationListener implements BDLocationListener {
         @Override
@@ -314,62 +468,58 @@ public class CreateAty extends MyActivity implements
                 MapStatus.Builder builder = new MapStatus.Builder();
                 builder.target(latLng).zoom(18.0f);
                 mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+                // 预置第一次进来，但是没有点击地图，默认初始化为当前位置坐标
+                currentStartLatSize = latLng.latitude;
+                currentStartLngSize = latLng.longitude;
             }
         }
 
     }
 
-//描绘点
-//    private void setMapMarker() {
-//        bitmap = BitmapDescriptorFactory.fromResource(R.mipmap.first);
-//        mBaiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
-//
-//            @Override
-//            public void onMapPoiClick(MapPoi arg0) {
-//                // TODO Auto-generated method stub
-//
-//            }
-//
-//            //此方法就是点击地图监听
-//            @Override
-//            public void onMapClick(LatLng latLng) {
-//                //获取经纬度
-//                double latitude = latLng.latitude;
-//                double longitude = latLng.longitude;
-//                System.out.println("latitude=" + latitude + ",longitude=" + longitude);
-//                //先清除图层
-//                mBaiduMap.clear();
-//                // 定义Maker坐标点
-//                LatLng point = new LatLng(latitude, longitude);
-//                // 构建MarkerOption，用于在地图上添加Marker
-//                MarkerOptions options = new MarkerOptions().position(point)
-//                        .icon(bitmap);
-//                // 在地图上添加Marker，并显示
-//                mBaiduMap.addOverlay(options);
-//                //实例化一个地理编码查询对象
-//                GeoCoder geoCoder = GeoCoder.newInstance();
-//                //设置反地理编码位置坐标
-//                ReverseGeoCodeOption op = new ReverseGeoCodeOption();
-//                op.location(latLng);
-//                //发起反地理编码请求(经纬度->地址信息)
-//                geoCoder.reverseGeoCode(op);
-//                geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
-//
-//                    @Override
-//                    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult arg0) {
-//                        //获取点击的坐标地址
-//                        address = arg0.getAddress();
-//                        System.out.println("address=" + address);
-//                    }
-//
-//                    @Override
-//                    public void onGetGeoCodeResult(GeoCodeResult arg0) {
-//                    }
-//                });
-//            }
-//        });
-//    }
+    /**
+     * 应该把这个方法替换成Handler执行
+     * @param confirm
+     * @param latitude
+     * @param longitude
+     * @param resId
+     */
+    private void setMarker(boolean confirm, double latitude, double longitude, int resId) {
+        // 只保留一个点
+        if (lastLocationIcon == resId) {
+            // 清除之前的marker
+            mMapView.getMap().clear();
+        }
+        if (lastLocationIcon != resId) {
+            if (endExitsFlag) {
+                mBaiduMap.clear();
+            }
+        }
+        lastLocationIcon = resId;
+        //构建Marker图标
+        BitmapDescriptor bitmap = BitmapDescriptorFactory
+                .fromResource(resId);
+        LatLng latLng = new LatLng(latitude, longitude);
+        if (resId == R.mipmap.first) {
+            //构建MarkerOption，用于在地图上添加Marker
+            startOption = new MarkerOptions()
+                    .position(latLng)
+                    .icon(bitmap);    //在地图上添加Marker，并显示
+        } else if (resId == R.mipmap.end) {
+            // else {
+            //构建MarkerOption，用于在地图上添加Marker
+            endOption = new MarkerOptions()
+                    .position(latLng)
+                    .icon(bitmap);    //在地图上添加Marker，并显示
+        }
 
+        if (startOption != null) {
+            mBaiduMap.addOverlay(startOption);
+        }
+        if (endOption != null) {
+            mBaiduMap.addOverlay(endOption);
+            endExitsFlag = true;
+        }
+    }
 
     @Override
     protected void onResume() {
@@ -393,5 +543,68 @@ public class CreateAty extends MyActivity implements
         mMapView.onDestroy();
         mMapView = null;
         super.onDestroy();
+    }
+
+    /**
+     * 键盘的事件监听
+     */
+    private void initKeyBoardListener() {
+        addEditTextListener(startLatView);
+        addEditTextListener(startLngView);
+        addEditTextListener(endLatView);
+        addEditTextListener(endLngView);
+    }
+
+    public void addEditTextListener(EditText editText) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // 1、数据更新到地图定位点
+                if (TextUtils.isEmpty(s)) {
+                    return;
+                }
+                // 起点坐标
+                if (editText == startLatView) {
+                    currentStartLatSize = Double.parseDouble(s.toString());
+                    if (TextUtils.isEmpty(startLngView.getText().toString())) {
+                        return;
+                    }
+                    setMarker(true, currentStartLatSize, currentStartLngSize, R.mipmap.first);
+                } else if (editText == startLngView) {
+                    currentStartLngSize = Double.parseDouble(s.toString());
+                    if (TextUtils.isEmpty(startLatView.getText().toString())) {
+                        return;
+                    }
+                    setMarker(true, currentStartLatSize, currentStartLngSize, R.mipmap.first);
+                }
+                // 终点
+                else if (editText == endLatView) {
+                    currentEndLatSize = Double.parseDouble(s.toString());
+                    if (TextUtils.isEmpty(endLngView.getText().toString())) {
+                        return;
+                    }
+                    setMarker(true, currentEndLatSize, currentEdnLngSize, R.mipmap.end);
+
+                } else if (editText == endLngView) {
+                    currentEdnLngSize = Double.parseDouble(s.toString());
+                    if (TextUtils.isEmpty(endLatView.getText().toString())) {
+                        return;
+                    }
+                    setMarker(true, currentEndLatSize, currentEdnLngSize, R.mipmap.end);
+                } else {
+                    throw new RuntimeException("This is Error");
+                }
+            }
+        });
     }
 }
