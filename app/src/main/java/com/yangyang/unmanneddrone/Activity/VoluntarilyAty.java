@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -21,8 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 //航线测量
-public class VoluntarilyAty extends MyActivity {
+public class VoluntarilyAty extends MyActivity implements View.OnClickListener {
     private VoluntarilyAdapter voluntarilyAdapter;
+    private ImageView iv_back;
 
     @Override
     protected void onCreate(@Nullable Bundle bundle) {
@@ -33,11 +36,13 @@ public class VoluntarilyAty extends MyActivity {
     }
 
     private void initView() {
+        iv_back=findViewById(R.id.iv_back);
         RecyclerView mRecyclerView = findViewById(R.id.rlv);
         voluntarilyAdapter = new VoluntarilyAdapter(this);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setAdapter(voluntarilyAdapter);
+        iv_back.setOnClickListener(this);
     }
 
     private void initData() {
@@ -81,5 +86,16 @@ public class VoluntarilyAty extends MyActivity {
             list.add(voluntarilyBody);
         }
         return list;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.iv_back:
+                Intent intent=new Intent(this,MainAty.class);
+                startActivity(intent);
+                finish();
+        }
+
     }
 }

@@ -1,6 +1,10 @@
 package com.yangyang.unmanneddrone.Activity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -11,15 +15,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.SeekBar;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.ZoomControls;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -39,11 +47,21 @@ import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.yangyang.tools.db.SQLiteHelper;
+import com.yangyang.tools.permission.OnPermission;
+import com.yangyang.tools.permission.Permission;
+import com.yangyang.tools.permission.XXPermissions;
+import com.yangyang.unmanneddrone.Body.SelectionBody;
 import com.yangyang.unmanneddrone.R;
 import com.yangyang.unmanneddrone.View.RoundMenuView;
 import com.yangyang.unmanneddrone.base.MyActivity;
 import com.yangyang.unmanneddrone.helper.Constants;
+import com.yangyang.unmanneddrone.helper.ExcelUtils;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,19 +78,16 @@ public class CreateAty extends MyActivity
     // 设置微调 的间距，默认为0.01
     private final double SPACE_SCROLL_SIZE = 0.0001;
     /**
-     * 百度SDK 定义 start
+     * 百度SDK
      */
     private BaiduMap mBaiduMap;   // 定义百度地图对象
     private LocationClient mLocationClient;  //定义LocationClient
     private boolean isFirstLoc = true;  //定义第一次启动
     private MyLocationConfiguration.LocationMode mCurrentMode;  //定义当前定位模式
     private LatLng latLng;
-    /**
-     * 百度SDK 定义 end
-     */
 
     /**
-     * xml控件View定义 start
+     * xml控件View定义
      */
     private MapView mMapView;     // 定义百度地图组件
     private ImageView arrowMapView;
@@ -81,9 +96,18 @@ public class CreateAty extends MyActivity
     private RoundMenuView roundView_two;
     private LinearLayout drawerRootView;
     private ViewFlipper viewFlipper;
-    /**
-     * xml控件View定义 end
-     */
+    private EditText startLatView;
+    private EditText startLngView;
+    private EditText endLatView;
+    private EditText endLngView;
+    private ImageButton mLocation;
+    private LinearLayout inputDataRootView;
+    private LinearLayout saveDataRootView;
+    private Button nextButtonView;
+    private ImageButton ib_save, ib_start;
+    //拖动条
+    private SeekBar sb_Hover_time, sb_Hover_height;
+    private EditText et_hover_time,et_hover_height;
     //动画
     Animation leftInAnimation;
     Animation leftOutAnimation;
@@ -101,11 +125,9 @@ public class CreateAty extends MyActivity
     private OverlayOptions startOption = null;
     private OverlayOptions endOption = null;
     private boolean endExitsFlag = false;
+    private Button importDataButtonView;
+    private RadioButton leftRadioButtonView;
 
-    private EditText startLatView;
-    private EditText startLngView;
-    private EditText endLatView;
-    private EditText endLngView;
 
     @Override
     protected void onCreate(@Nullable Bundle bundle) {
@@ -113,7 +135,7 @@ public class CreateAty extends MyActivity
         setContentView(R.layout.aty_create);
         initView();
         setInit();
-
+        initListener();
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -123,8 +145,8 @@ public class CreateAty extends MyActivity
         //获取地图组件
         mMapView = findViewById(R.id.mv_map);
         //定义定位到当前位置按钮
-        ImageButton mLocation = findViewById(R.id.ib_location);
-        mLocation.setOnClickListener(this);
+        mLocation = findViewById(R.id.ib_location);
+
 
         ///others
         arrowMapView = findViewById(R.id.iv_arrow_map);
@@ -136,15 +158,71 @@ public class CreateAty extends MyActivity
 
         drawerRootView = findViewById(R.id.ll_drawer_root);
         viewFlipper = findViewById(R.id.viewFlipper);
-        drawerRootView.setOnTouchListener(this);
+        leftRadioButtonView = findViewById(R.id.cb_left);
         //动画效果
         leftInAnimation = AnimationUtils.loadAnimation(this, R.anim.left_in);
         leftOutAnimation = AnimationUtils.loadAnimation(this, R.anim.left_out);
         rightInAnimation = AnimationUtils.loadAnimation(this, R.anim.right_in);
         rightOutAnimation = AnimationUtils.loadAnimation(this, R.anim.right_out);
 
+        inputDataRootView = findViewById(R.id.ll_input_data_root);
+        saveDataRootView = findViewById(R.id.ll_save_data_root);
+        nextButtonView = findViewById(R.id.bt_next);
+        ib_save = findViewById(R.id.ib_save);
+        ib_start = findViewById(R.id.ib_start);
+
+        // 数据导入page
+        importDataButtonView = findViewById(R.id.button_Import_data);
+        //拖动条
+        et_hover_time=findViewById(R.id.et_hover_time);
+        et_hover_height=findViewById(R.id.et_hover_height);
+        sb_Hover_time =findViewById(R.id.sb_Hover_time);
+        sb_Hover_height=findViewById(R.id.sb_Hover_height);
+        sb_Hover_time.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                et_hover_time.setText(Integer.toString(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        sb_Hover_height.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                et_hover_height.setText(Integer.toString(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+    }
+
+    private void initListener() {
+        mLocation.setOnClickListener(this);
+        drawerRootView.setOnTouchListener(this);
+        nextButtonView.setOnClickListener(this);
+
         roundView_one.setmOnClickListener(this);
         roundView_two.setmOnClickListener(this);
+        importDataButtonView.setOnClickListener(this);
+
+        leftRadioButtonView.setOnClickListener(this);
     }
 
     private void setInit() {
@@ -185,6 +263,7 @@ public class CreateAty extends MyActivity
         mBaiduMap.setOnMapClickListener(this);
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -193,42 +272,102 @@ public class CreateAty extends MyActivity
                 builder.target(latLng).zoom(18.0f);
                 mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
                 break;
-//            case R.id.iv_arrow_map:
-//                int width = View.MeasureSpec.makeMeasureSpec(0,
-//                        View.MeasureSpec.UNSPECIFIED);
-//                int height = View.MeasureSpec.makeMeasureSpec(0,
-//                        View.MeasureSpec.UNSPECIFIED);
-//                drawerRootView.measure(width, height);
-//                drawerRootView.getMeasuredWidth(); // 获取宽度
-//                drawerRootView.getMeasuredHeight(); // 获取高度
-//                switch (width) {
-//                    case 180:
-//                        Log.e(TAG, "=======drawerRootView.getMeasuredWidth()----------" + drawerRootView.getMeasuredWidth());
-//                        ViewGroup.LayoutParams lp2;
-//                        lp2 = drawerRootView.getLayoutParams();
-//                        lp2.width = 800;
-//                        lp2.height = LinearLayout.LayoutParams.MATCH_PARENT;
-//                        drawerRootView.setLayoutParams(lp2);
-//                        arrowMapView.setRotation(180);
-//                        viewFlipper.setInAnimation(this, R.anim.left_in);
-//                        viewFlipper.showNext();
-//                        break;
-//                    case 800:
-//                        Log.e(TAG, "=======drawerRootView.getMeasuredWidth()----------" + drawerRootView.getMeasuredWidth());
-//                        ViewGroup.LayoutParams lp;
-//                        lp = drawerRootView.getLayoutParams();
-//                        lp.width = 180;
-//                        lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
-//                        drawerRootView.setLayoutParams(lp);
-//                        arrowMapView.setRotation(0);
-//                        break;
-//
+            case R.id.bt_next:
+//                if (TextUtils.isEmpty(startLatView.getText().toString())
+//                        || TextUtils.isEmpty(startLngView.getText().toString())
+//                        || TextUtils.isEmpty(endLatView.getText().toString())
+//                        || TextUtils.isEmpty(endLngView.getText().toString())) {
+//                    Toast.makeText(this, "请确认输入数据是否完整", Toast.LENGTH_SHORT).show();
+//                    return;
 //                }
+                inputDataRootView.setVisibility(View.GONE);
+                saveDataRootView.setVisibility(View.VISIBLE);
+                ib_save.setVisibility(View.VISIBLE);
+                ib_start.setVisibility(View.VISIBLE);
+                break;
+            case R.id.iv_arrow_map:
+                float rotation = arrowMapView.getRotation();
+                if (rotation == 0) {
+                    setPageSlideLeftParams();
+                }
+                if (rotation == 180) {
+                    setPageSlideRightParams();
+                }
+                break;
+            case R.id.button_Import_data:
+                // 打开手机文件中选择excel文件，目前暂时写死
+                XXPermissions.with(this)
+                        .permission(Permission.Group.STORAGE)
+                        .request(new OnPermission() {
+                            @Override
+                            public void hasPermission(List<String> granted, boolean all) {
+                                if (all) {
+//                                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                                    intent.addCategory("android.intent.category.DEFAULT");
+//                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                    intent.setType("*/*");
+//                                    startActivityForResult(intent, Constants.getInstance().FILE_REQUEST_CODE);
+
+                                    // excel数据导入
+                                    try {
+                                        List<SelectionBody> selectionBodyList = new ArrayList<>();
+                                        InputStream inputStream = getAssets().open("selection_table.xlsx");
+                                        List<SelectionBody> excelDataList = ExcelUtils.readExcel(inputStream, selectionBodyList);
+                                        Log.d(TAG, "--->" + excelDataList.size() + "--->" + excelDataList);
+                                        // 暂存入数据库
+                                        // SQLiteHelper.with(CreateAty.this).insert(excelDataList);
+                                        for (SelectionBody body : excelDataList) {
+                                            SQLiteHelper.with(CreateAty.this).insert(body);
+                                        }
+                                    } catch (Exception e) {
+                                        Log.e(TAG, "-----------_>" + e.toString());
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void noPermission(List<String> denied, boolean never) {
+                                Toast.makeText(CreateAty.this, "当前权限不足,谢谢！", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                break;
             default:
                 break;
         }
     }
 
+    /*  @Override
+      protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+          super.onActivityResult(requestCode, resultCode, data);
+          if (data == null) {
+              return;
+          }
+          if (requestCode == Constants.getInstance().FILE_REQUEST_CODE) {
+              // excel数据导入
+              Uri uri = data.getData();
+              File file = null;   //图片地址
+              try {
+                  file = new File(new URI(uri.toString()));
+              } catch (URISyntaxException e) {
+                  e.printStackTrace();
+              }
+              try {
+                  List<SelectionBody> selectionBodyList = new ArrayList<>();
+                  List<SelectionBody> excelDataList = ExcelUtils.readExcel(file, selectionBodyList);
+                  Log.d(TAG, "--->" + excelDataList.size() + "--->" + excelDataList);
+                  // 暂存入数据库
+                  // SQLiteHelper.with(CreateAty.this).insert(excelDataList);
+                  for (SelectionBody body : excelDataList) {
+                      SQLiteHelper.with(CreateAty.this).insert(body);
+                  }
+              } catch (Exception e) {
+                  Log.e(TAG, "-----------_>" + e.toString());
+                  e.printStackTrace();
+              }
+          }
+      }
+  */
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -267,27 +406,11 @@ public class CreateAty extends MyActivity
                     switch (orientation) {
                         case 'r':
                             action = "右";
-                            ViewGroup.LayoutParams lp;
-                            lp = drawerRootView.getLayoutParams();
-                            lp.width = 180;
-                            lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
-                            drawerRootView.setLayoutParams(lp);
-                            arrowMapView.setRotation(0);
-                            roundView_one.setVisibility(View.GONE);
-                            roundView_two.setVisibility(View.GONE);
+                            setPageSlideRightParams();
                             break;
                         case 'l':
                             action = "左";
-                            ViewGroup.LayoutParams lp2;
-                            lp2 = drawerRootView.getLayoutParams();
-                            lp2.width = 800;
-                            lp2.height = LinearLayout.LayoutParams.MATCH_PARENT;
-                            drawerRootView.setLayoutParams(lp2);
-                            arrowMapView.setRotation(180);
-                            viewFlipper.setInAnimation(this, R.anim.left_in);
-                            viewFlipper.showNext();
-                            roundView_one.setVisibility(View.VISIBLE);
-                            roundView_two.setVisibility(View.VISIBLE);
+                            setPageSlideLeftParams();
                             break;
                         case 't':
                             action = "上";
@@ -303,6 +426,35 @@ public class CreateAty extends MyActivity
         return super.onTouchEvent(event);
     }
 
+    /**
+     * 设置右滑属性
+     */
+    private void setPageSlideRightParams() {
+        ViewGroup.LayoutParams lp;
+        lp = drawerRootView.getLayoutParams();
+        lp.width = 180;
+        lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
+        drawerRootView.setLayoutParams(lp);
+        arrowMapView.setRotation(0);
+        roundView_one.setVisibility(View.GONE);
+        roundView_two.setVisibility(View.GONE);
+    }
+
+    /**
+     * 设置左滑属性
+     */
+    private void setPageSlideLeftParams() {
+        ViewGroup.LayoutParams lp2;
+        lp2 = drawerRootView.getLayoutParams();
+        lp2.width = 800;
+        lp2.height = LinearLayout.LayoutParams.MATCH_PARENT;
+        drawerRootView.setLayoutParams(lp2);
+        arrowMapView.setRotation(180);
+        viewFlipper.setInAnimation(this, R.anim.left_in);
+        viewFlipper.showNext();
+        roundView_one.setVisibility(View.VISIBLE);
+        roundView_two.setVisibility(View.VISIBLE);
+    }
 
     /**
      * 根据距离差判断 滑动方向 * @param dx X轴的距离差 * @param dy Y轴的距离差 * @return 滑动的方向
@@ -478,47 +630,50 @@ public class CreateAty extends MyActivity
 
     /**
      * 应该把这个方法替换成Handler执行
+     *
      * @param confirm
      * @param latitude
      * @param longitude
      * @param resId
      */
     private void setMarker(boolean confirm, double latitude, double longitude, int resId) {
-        // 只保留一个点
-        if (lastLocationIcon == resId) {
-            // 清除之前的marker
-            mMapView.getMap().clear();
-        }
-        if (lastLocationIcon != resId) {
-            if (endExitsFlag) {
-                mBaiduMap.clear();
+        runOnUiThread(() -> {
+            // 只保留一个点
+            if (lastLocationIcon == resId) {
+                // 清除之前的marker
+                mMapView.getMap().clear();
             }
-        }
-        lastLocationIcon = resId;
-        //构建Marker图标
-        BitmapDescriptor bitmap = BitmapDescriptorFactory
-                .fromResource(resId);
-        LatLng latLng = new LatLng(latitude, longitude);
-        if (resId == R.mipmap.first) {
-            //构建MarkerOption，用于在地图上添加Marker
-            startOption = new MarkerOptions()
-                    .position(latLng)
-                    .icon(bitmap);    //在地图上添加Marker，并显示
-        } else if (resId == R.mipmap.end) {
-            // else {
-            //构建MarkerOption，用于在地图上添加Marker
-            endOption = new MarkerOptions()
-                    .position(latLng)
-                    .icon(bitmap);    //在地图上添加Marker，并显示
-        }
+            if (lastLocationIcon != resId) {
+                if (endExitsFlag) {
+                    mBaiduMap.clear();
+                }
+            }
+            lastLocationIcon = resId;
+            //构建Marker图标
+            BitmapDescriptor bitmap = BitmapDescriptorFactory
+                    .fromResource(resId);
+            LatLng latLng = new LatLng(latitude, longitude);
+            if (resId == R.mipmap.first) {
+                //构建MarkerOption，用于在地图上添加Marker
+                startOption = new MarkerOptions()
+                        .position(latLng)
+                        .icon(bitmap);    //在地图上添加Marker，并显示
+            } else if (resId == R.mipmap.end) {
+                // else {
+                //构建MarkerOption，用于在地图上添加Marker
+                endOption = new MarkerOptions()
+                        .position(latLng)
+                        .icon(bitmap);    //在地图上添加Marker，并显示
+            }
 
-        if (startOption != null) {
-            mBaiduMap.addOverlay(startOption);
-        }
-        if (endOption != null) {
-            mBaiduMap.addOverlay(endOption);
-            endExitsFlag = true;
-        }
+            if (startOption != null) {
+                mBaiduMap.addOverlay(startOption);
+            }
+            if (endOption != null) {
+                mBaiduMap.addOverlay(endOption);
+                endExitsFlag = true;
+            }
+        });
     }
 
     @Override

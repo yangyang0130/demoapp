@@ -31,9 +31,6 @@ public class InitializeAty extends MyActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aty_initialize);
         onInView();
-
-
-
     }
 
     private void onInView() {
@@ -60,14 +57,13 @@ public class InitializeAty extends MyActivity {
                 super.run();
                 while (index <= 100) {
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(1);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     handler.sendEmptyMessage(index);
                     index++;
                 }
-
             }
         };
         thread.start();

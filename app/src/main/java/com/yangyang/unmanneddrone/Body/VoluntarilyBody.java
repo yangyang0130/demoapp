@@ -1,11 +1,5 @@
 package com.yangyang.unmanneddrone.Body;
 
-import android.app.ApplicationErrorReport;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import java.util.List;
-
 //航线库
 public class VoluntarilyBody {
 
@@ -14,9 +8,9 @@ public class VoluntarilyBody {
     private String update_time;
     private String location;
     private int flag = 0;               // 0== flag: button else --> data
-    
-    public VoluntarilyBody(){
-        
+
+    public VoluntarilyBody() {
+
     }
 
     public int getMap() {

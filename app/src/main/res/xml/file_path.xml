@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+
+    <!-- 适配Android7.0 文件意图-->
+    <external-path
+        name="Android/data/com.yangyang.unmanneddrone/"
+        path="files_root" />
+
+    <external-path
+        name="."
+        path="external_storage_root" />
+</paths>

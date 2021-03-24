@@ -4,16 +4,33 @@ import android.app.Application;
 
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
+import com.yangyang.tools.db.SQLiteHelper;
+import com.yangyang.unmanneddrone.Body.SelectionBody;
 
 public class MyApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        initSDK();
+        initDB();
+    }
+
+    /**
+     * 初始化三方SDK
+     */
+    private void initSDK() {
         //初始化地图SDK
         SDKInitializer.initialize(this);
         SDKInitializer.setCoordType(CoordType.BD09LL);
+    }
 
-        // /home/yangyang/disk_1T/UnmannedDrone/app/libs/BaiduLBS_android.jar
+    /**
+     * 初始化数据库
+     */
+    private void initDB() {
+        //
+        SQLiteHelper.with(this).createTable(SelectionBody.class);
     }
 }

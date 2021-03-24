@@ -44,6 +44,17 @@
             </intent-filter>
         </activity>
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.yangyang.unmanneddrone.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_path" />
+        </provider>
+
+
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="WBPITtItKcwOSBEgw9WhdCEHh5Et0l7W" />

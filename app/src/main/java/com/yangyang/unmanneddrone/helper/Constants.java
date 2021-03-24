@@ -22,4 +22,9 @@ public final class Constants{
     public final int Click_DOWN_ARROW = 0x0004;
     public final int Click_CENTER_ARROW = 0x0005;
 
+
+    /**
+     * 打开文件request
+     */
+    public final int FILE_REQUEST_CODE = 0xffff;
 }
