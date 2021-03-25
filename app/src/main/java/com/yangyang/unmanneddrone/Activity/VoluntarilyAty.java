@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -11,10 +12,12 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.yangyang.tools.db.SQLiteHelper;
 import com.yangyang.tools.permission.OnPermission;
 import com.yangyang.tools.permission.Permission;
 import com.yangyang.tools.permission.XXPermissions;
 import com.yangyang.unmanneddrone.Adapter.VoluntarilyAdapter;
+import com.yangyang.unmanneddrone.Body.LocationMsgBody;
 import com.yangyang.unmanneddrone.Body.VoluntarilyBody;
 import com.yangyang.unmanneddrone.R;
 import com.yangyang.unmanneddrone.base.MyActivity;
@@ -92,10 +95,17 @@ public class VoluntarilyAty extends MyActivity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.iv_back:
-                Intent intent=new Intent(this,MainAty.class);
-                startActivity(intent);
                 finish();
         }
+    }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 查询数据库所保存的航线数据
+        List<LocationMsgBody> locationMsgBodyList = SQLiteHelper.with(this).query(LocationMsgBody.class);
+        //
+        Log.d(TAG, "----->" + locationMsgBodyList);
     }
 }

@@ -5,6 +5,7 @@ import android.app.Application;
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
 import com.yangyang.tools.db.SQLiteHelper;
+import com.yangyang.unmanneddrone.Body.LocationMsgBody;
 import com.yangyang.unmanneddrone.Body.SelectionBody;
 
 public class MyApplication extends Application {
@@ -32,5 +33,6 @@ public class MyApplication extends Application {
     private void initDB() {
         //
         SQLiteHelper.with(this).createTable(SelectionBody.class);
+        SQLiteHelper.with(this).createTable(LocationMsgBody.class);
     }
 }

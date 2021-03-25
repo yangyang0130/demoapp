@@ -25,6 +25,7 @@
         </TextView>
 
         <EditText
+            android:id="@+id/et_title"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginLeft="30dp"
@@ -36,7 +37,6 @@
             android:maxLines="1"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:text="谢家湾飞行"
             android:textColor="#03A9F4"
             android:textSize="11sp">
 

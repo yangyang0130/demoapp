@@ -1,11 +1,17 @@
 package com.yangyang.unmanneddrone.Activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -21,13 +27,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.ZoomControls;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -47,27 +55,28 @@ import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.bumptech.glide.Glide;
 import com.yangyang.tools.db.SQLiteHelper;
 import com.yangyang.tools.permission.OnPermission;
 import com.yangyang.tools.permission.Permission;
 import com.yangyang.tools.permission.XXPermissions;
+import com.yangyang.unmanneddrone.Body.LocationMsgBody;
 import com.yangyang.unmanneddrone.Body.SelectionBody;
 import com.yangyang.unmanneddrone.R;
 import com.yangyang.unmanneddrone.View.RoundMenuView;
 import com.yangyang.unmanneddrone.base.MyActivity;
 import com.yangyang.unmanneddrone.helper.Constants;
 import com.yangyang.unmanneddrone.helper.ExcelUtils;
+import com.yangyang.unmanneddrone.helper.ImageHelper;
 
-import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CreateAty extends MyActivity
         implements View.OnClickListener, View.OnTouchListener,
-        RoundMenuView.OnViewClickListener, BaiduMap.OnMapClickListener {
+        RoundMenuView.OnViewClickListener, BaiduMap.OnMapClickListener,
+        BaiduMap.SnapshotReadyCallback {
 
     /**
      * 选择的轮盘 默认选择起点
@@ -85,6 +94,8 @@ public class CreateAty extends MyActivity
     private boolean isFirstLoc = true;  //定义第一次启动
     private MyLocationConfiguration.LocationMode mCurrentMode;  //定义当前定位模式
     private LatLng latLng;
+    private LocationManager lm;
+    private static final int PRIVATE_CODE = 1315;//开启GPS权限
 
     /**
      * xml控件View定义
@@ -107,7 +118,8 @@ public class CreateAty extends MyActivity
     private ImageButton ib_save, ib_start;
     //拖动条
     private SeekBar sb_Hover_time, sb_Hover_height;
-    private EditText et_hover_time,et_hover_height;
+    private EditText et_hover_time, et_hover_height;
+    private EditText et_title;
     //动画
     Animation leftInAnimation;
     Animation leftOutAnimation;
@@ -127,6 +139,9 @@ public class CreateAty extends MyActivity
     private boolean endExitsFlag = false;
     private Button importDataButtonView;
     private RadioButton leftRadioButtonView;
+    private ImageView imageView;
+    private RelativeLayout mapParentView;
+    private LocationMsgBody locationMsgBody;
 
 
     @Override
@@ -136,6 +151,7 @@ public class CreateAty extends MyActivity
         initView();
         setInit();
         initListener();
+        showGPSContacts();
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -147,7 +163,8 @@ public class CreateAty extends MyActivity
         //定义定位到当前位置按钮
         mLocation = findViewById(R.id.ib_location);
 
-
+        imageView = findViewById(R.id.iv_image);
+        mapParentView = findViewById(R.id.rl_map_parent);
         ///others
         arrowMapView = findViewById(R.id.iv_arrow_map);
         startLatView = findViewById(R.id.et_start_Latitude);
@@ -170,18 +187,19 @@ public class CreateAty extends MyActivity
         nextButtonView = findViewById(R.id.bt_next);
         ib_save = findViewById(R.id.ib_save);
         ib_start = findViewById(R.id.ib_start);
+        et_title = findViewById(R.id.et_title);
 
         // 数据导入page
         importDataButtonView = findViewById(R.id.button_Import_data);
         //拖动条
-        et_hover_time=findViewById(R.id.et_hover_time);
-        et_hover_height=findViewById(R.id.et_hover_height);
-        sb_Hover_time =findViewById(R.id.sb_Hover_time);
-        sb_Hover_height=findViewById(R.id.sb_Hover_height);
+        et_hover_time = findViewById(R.id.et_hover_time);
+        et_hover_height = findViewById(R.id.et_hover_height);
+        sb_Hover_time = findViewById(R.id.sb_Hover_time);
+        sb_Hover_height = findViewById(R.id.sb_Hover_height);
         sb_Hover_time.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                et_hover_time.setText(Integer.toString(progress));
+                et_hover_time.setText(String.valueOf(progress));
             }
 
             @Override
@@ -197,7 +215,7 @@ public class CreateAty extends MyActivity
         sb_Hover_height.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                et_hover_height.setText(Integer.toString(progress));
+                et_hover_height.setText(String.valueOf(progress));
             }
 
             @Override
@@ -221,7 +239,7 @@ public class CreateAty extends MyActivity
         roundView_one.setmOnClickListener(this);
         roundView_two.setmOnClickListener(this);
         importDataButtonView.setOnClickListener(this);
-
+        ib_save.setOnClickListener(this);
         leftRadioButtonView.setOnClickListener(this);
     }
 
@@ -230,12 +248,14 @@ public class CreateAty extends MyActivity
         // map init
         mBaiduMap = mMapView.getMap();  //获取百度地图对象
         mBaiduMap.setMyLocationEnabled(true);
+
         mLocationClient = new LocationClient(this);  //创建LocationClient类
         mLocationClient.registerLocationListener(new MyLocationListener());   //注册监听函数
         initLocation();  //调用initLocation()方法，实现初始化定位
 
         initKeyBoardListener();
 
+        locationMsgBody = new LocationMsgBody();
     }
 
     private void initLocation() {  //该方法实现初始化定位
@@ -243,8 +263,11 @@ public class CreateAty extends MyActivity
         LocationClientOption option = new LocationClientOption();
         option.setCoorType("bd09ll");  //设置坐标类型
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
-        option.setScanSpan(1000);      //1秒定位一次
+        option.setScanSpan(3000);      //1秒定位一次
         option.setOpenGps(true);      //打开GPS
+        option.setAddrType("all");//返回定位结果包含地址信息
+        option.setPriority(LocationClientOption.NetWorkFirst); // 设置网络优先
+        option.setPriority(LocationClientOption.GpsFirst);       //gps
         mLocationClient.setLocOption(option);  //保存定位参数与信息
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;  //设置定位模式
 
@@ -267,11 +290,16 @@ public class CreateAty extends MyActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            //回到当前定位按钮
             case R.id.ib_location:
                 MapStatus.Builder builder = new MapStatus.Builder();
                 builder.target(latLng).zoom(18.0f);
                 mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+
+                //
+                mBaiduMap.snapshot(this);
                 break;
+            //下一步按钮
             case R.id.bt_next:
 //                if (TextUtils.isEmpty(startLatView.getText().toString())
 //                        || TextUtils.isEmpty(startLngView.getText().toString())
@@ -294,6 +322,7 @@ public class CreateAty extends MyActivity
                     setPageSlideRightParams();
                 }
                 break;
+            //导入数据按钮
             case R.id.button_Import_data:
                 // 打开手机文件中选择excel文件，目前暂时写死
                 XXPermissions.with(this)
@@ -332,6 +361,21 @@ public class CreateAty extends MyActivity
                             }
                         });
                 break;
+            case R.id.ib_save:
+                // 保存数据到数据库
+                long insert = SQLiteHelper.with(this).insert(locationMsgBody);
+                if (insert > 0){
+                    Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+                    // 加一个延迟1秒钟
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            finish();
+                        }
+                    }, 1000);
+                }
+                break;
             default:
                 break;
         }
@@ -368,6 +412,7 @@ public class CreateAty extends MyActivity
           }
       }
   */
+    //左右滑动
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -407,10 +452,14 @@ public class CreateAty extends MyActivity
                         case 'r':
                             action = "右";
                             setPageSlideRightParams();
+                            saveDataRootView.setVisibility(View.GONE);
+                            inputDataRootView.setVisibility(View.GONE);
                             break;
                         case 'l':
                             action = "左";
                             setPageSlideLeftParams();
+                            saveDataRootView.setVisibility(View.VISIBLE);
+                            inputDataRootView.setVisibility(View.VISIBLE);
                             break;
                         case 't':
                             action = "上";
@@ -590,6 +639,16 @@ public class CreateAty extends MyActivity
         // poi
     }
 
+    @Override
+    public void onSnapshotReady(Bitmap bitmap) {
+        // 百度地图截图
+//        Glide.with(this)
+//                .load(bitmap)
+//                .into(imageView);
+        // 数据库保存图片
+        locationMsgBody.setThumbnail_path(ImageHelper.bitmapToBase64(bitmap));
+    }
+
     //设置定位监听器
     public class MyLocationListener implements BDLocationListener {
         @Override
@@ -701,13 +760,15 @@ public class CreateAty extends MyActivity
     }
 
     /**
-     * 键盘的事件监听
+     * EditText键盘的事件监听
      */
     private void initKeyBoardListener() {
         addEditTextListener(startLatView);
         addEditTextListener(startLngView);
         addEditTextListener(endLatView);
         addEditTextListener(endLngView);
+        addEditTextListener(et_hover_time);
+        addEditTextListener(et_hover_height);
     }
 
     public void addEditTextListener(EditText editText) {
@@ -728,6 +789,7 @@ public class CreateAty extends MyActivity
                 if (TextUtils.isEmpty(s)) {
                     return;
                 }
+
                 // 起点坐标
                 if (editText == startLatView) {
                     currentStartLatSize = Double.parseDouble(s.toString());
@@ -756,10 +818,59 @@ public class CreateAty extends MyActivity
                         return;
                     }
                     setMarker(true, currentEndLatSize, currentEdnLngSize, R.mipmap.end);
+                } else if (editText == et_hover_height) {
+                    sb_Hover_height.setProgress(Integer.parseInt(s.toString()));
+                } else if (editText == et_hover_time) {
+                    sb_Hover_time.setProgress(Integer.parseInt(s.toString()));
                 } else {
                     throw new RuntimeException("This is Error");
                 }
             }
         });
+    }
+
+    public void showGPSContacts() {
+        //得到系统的位置服务，判断GPS是否激活
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean ok = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        if (ok) {
+            if (Build.VERSION.SDK_INT >= 23) { //判断是否为android6.0系统版本，如果是，需要动态添加权限
+                if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                        (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+                    // 没有权限，申请权限。
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 2);
+                } else {
+                    mLocationClient.start();
+                }
+
+            } else {
+                mLocationClient.start();
+            }
+        } else {
+            final AlertDialog.Builder normalDialog =
+                    new AlertDialog.Builder(this);
+            normalDialog.setIcon(R.drawable.ic_location_dialog);
+            normalDialog.setTitle("定位失败");
+            normalDialog.setMessage("请检查是否开启定位服务?");
+            normalDialog.setPositiveButton("立即开启",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivityForResult(intent, PRIVATE_CODE);
+                        }
+                    });
+            normalDialog.setNegativeButton("取消",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            Toast.makeText(CreateAty.this, "定位未打开，无法获取当前位置！", Toast.LENGTH_LONG).show();
+                        }
+                    });
+            normalDialog.show();
+        }
+
     }
 }
