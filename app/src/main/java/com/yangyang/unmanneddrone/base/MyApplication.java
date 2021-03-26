@@ -31,8 +31,10 @@ public class MyApplication extends Application {
      * 初始化数据库
      */
     private void initDB() {
-        //
+        //excel数据表
         SQLiteHelper.with(this).createTable(SelectionBody.class);
+        //SQLiteHelper.with(this).dropTable(LocationMsgBody.class.getSimpleName());
+        //航线库数据表
         SQLiteHelper.with(this).createTable(LocationMsgBody.class);
     }
 }

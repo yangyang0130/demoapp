@@ -27,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -55,7 +56,6 @@ import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
-import com.bumptech.glide.Glide;
 import com.yangyang.tools.db.SQLiteHelper;
 import com.yangyang.tools.permission.OnPermission;
 import com.yangyang.tools.permission.Permission;
@@ -66,17 +66,20 @@ import com.yangyang.unmanneddrone.R;
 import com.yangyang.unmanneddrone.View.RoundMenuView;
 import com.yangyang.unmanneddrone.base.MyActivity;
 import com.yangyang.unmanneddrone.helper.Constants;
+import com.yangyang.unmanneddrone.helper.DoubleClickHelper;
 import com.yangyang.unmanneddrone.helper.ExcelUtils;
 import com.yangyang.unmanneddrone.helper.ImageHelper;
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class CreateAty extends MyActivity
         implements View.OnClickListener, View.OnTouchListener,
         RoundMenuView.OnViewClickListener, BaiduMap.OnMapClickListener,
-        BaiduMap.SnapshotReadyCallback {
+        BaiduMap.SnapshotReadyCallback, RadioGroup.OnCheckedChangeListener {
 
     /**
      * 选择的轮盘 默认选择起点
@@ -128,6 +131,14 @@ public class CreateAty extends MyActivity
     //手势滑动
     private float downX;    //按下时 的X坐标
     private float downY;    //按下时 的Y坐标
+    private Button importDataButtonView;
+    private RadioButton leftRadioButtonView;
+    private ImageView imageView;
+    private RelativeLayout mapParentView;
+    private ImageView excel;
+    private RadioButton cb_left, cb_right;
+    private RadioGroup hover_direction;
+
 
     /**
      * 设置marker
@@ -137,11 +148,11 @@ public class CreateAty extends MyActivity
     private OverlayOptions startOption = null;
     private OverlayOptions endOption = null;
     private boolean endExitsFlag = false;
-    private Button importDataButtonView;
-    private RadioButton leftRadioButtonView;
-    private ImageView imageView;
-    private RelativeLayout mapParentView;
+
+
+    //数据库
     private LocationMsgBody locationMsgBody;
+    private String currentAddress;
 
 
     @Override
@@ -152,6 +163,49 @@ public class CreateAty extends MyActivity
         setInit();
         initListener();
         showGPSContacts();
+        initData();
+    }
+
+    /**
+     * 初始化信息数据
+     */
+    private void initData() {
+        String transId = getIntent().getStringExtra("transId");
+        if (!TextUtils.isEmpty(transId)) {
+            List<LocationMsgBody> msgBodyList = SQLiteHelper.with(this).query(LocationMsgBody.class,
+                    "select * from " + LocationMsgBody.class.getSimpleName() + " where id=" + transId);
+            Log.d(TAG, "-----传递过来的数据------>" + msgBodyList);
+            // 把数据填充到页面上
+            if (msgBodyList.size() != 0) {
+                LocationMsgBody msgBody = msgBodyList.get(0);
+                et_title.setText(msgBody.getRouteName());
+                startLatView.setText(msgBody.getStartLat());
+                startLngView.setText(msgBody.getStartLng());
+                endLngView.setText(msgBody.getEndLng());
+                endLatView.setText(msgBody.getEndLat());
+                et_hover_time.setText(msgBody.getHoverTime());
+                et_hover_height.setText(msgBody.getHoverHeight());
+                //起点
+                LatLng startLatLng = new LatLng(Double.parseDouble(startLatView.getText().toString()),
+                        Double.parseDouble(startLngView.getText().toString()));
+                // 终点
+                LatLng endLatLng = new LatLng(Double.parseDouble(endLatView.getText().toString()),
+                        Double.parseDouble(endLngView.getText().toString()));
+                List<LatLng> lineList = new ArrayList<LatLng>();
+                lineList.add(startLatLng);
+                lineList.add(endLatLng);
+                //设置折线的属性
+                OverlayOptions mOverlayOptions = new PolylineOptions()
+                        .width(10)
+                        .color(0xAAFF0000)
+                        .points(lineList);
+                //在地图上绘制折线
+                //mPloyline 折线对象
+                Overlay mPolyline = mBaiduMap.addOverlay(mOverlayOptions);
+
+
+            }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -188,6 +242,11 @@ public class CreateAty extends MyActivity
         ib_save = findViewById(R.id.ib_save);
         ib_start = findViewById(R.id.ib_start);
         et_title = findViewById(R.id.et_title);
+        excel = findViewById(R.id.excel);
+        cb_left = findViewById(R.id.cb_left);
+        cb_right = findViewById(R.id.cb_right);
+        hover_direction = findViewById(R.id.hover_direction);
+
 
         // 数据导入page
         importDataButtonView = findViewById(R.id.button_Import_data);
@@ -235,12 +294,12 @@ public class CreateAty extends MyActivity
         mLocation.setOnClickListener(this);
         drawerRootView.setOnTouchListener(this);
         nextButtonView.setOnClickListener(this);
-
         roundView_one.setmOnClickListener(this);
         roundView_two.setmOnClickListener(this);
         importDataButtonView.setOnClickListener(this);
         ib_save.setOnClickListener(this);
         leftRadioButtonView.setOnClickListener(this);
+        hover_direction.setOnCheckedChangeListener(this);
     }
 
     private void setInit() {
@@ -289,25 +348,27 @@ public class CreateAty extends MyActivity
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
+        //屏蔽短时间内双击
+        if (DoubleClickHelper.isOnDoubleClick()) {
+            return;
+        }
         switch (v.getId()) {
             //回到当前定位按钮
             case R.id.ib_location:
                 MapStatus.Builder builder = new MapStatus.Builder();
                 builder.target(latLng).zoom(18.0f);
                 mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
-
-                //
-                mBaiduMap.snapshot(this);
                 break;
             //下一步按钮
             case R.id.bt_next:
-//                if (TextUtils.isEmpty(startLatView.getText().toString())
-//                        || TextUtils.isEmpty(startLngView.getText().toString())
-//                        || TextUtils.isEmpty(endLatView.getText().toString())
-//                        || TextUtils.isEmpty(endLngView.getText().toString())) {
-//                    Toast.makeText(this, "请确认输入数据是否完整", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
+                if (TextUtils.isEmpty(startLatView.getText().toString())
+                        || TextUtils.isEmpty(startLngView.getText().toString())
+                        || TextUtils.isEmpty(endLatView.getText().toString())
+                        || TextUtils.isEmpty(endLngView.getText().toString())) {
+                    Toast.makeText(this, "请确认输入数据是否完整", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                mBaiduMap.snapshot(this);
                 inputDataRootView.setVisibility(View.GONE);
                 saveDataRootView.setVisibility(View.VISIBLE);
                 ib_save.setVisibility(View.VISIBLE);
@@ -348,6 +409,8 @@ public class CreateAty extends MyActivity
                                         for (SelectionBody body : excelDataList) {
                                             SQLiteHelper.with(CreateAty.this).insert(body);
                                         }
+                                        excel.setVisibility(View.VISIBLE);
+                                        Toast.makeText(CreateAty.this, "已导入断面", Toast.LENGTH_SHORT).show();
                                     } catch (Exception e) {
                                         Log.e(TAG, "-----------_>" + e.toString());
                                         e.printStackTrace();
@@ -363,8 +426,24 @@ public class CreateAty extends MyActivity
                 break;
             case R.id.ib_save:
                 // 保存数据到数据库
+                //起点终点经纬度存入数据库
+                locationMsgBody.setStartLat(startLatView.getText().toString());
+                locationMsgBody.setEndLat(endLatView.getText().toString());
+                locationMsgBody.setEndLng(endLngView.getText().toString());
+                locationMsgBody.setStartLng(startLngView.getText().toString());
+                //悬停时间存入数据库
+                locationMsgBody.setHoverTime(et_hover_time.getText().toString());
+                //悬停高度存入数据库
+                locationMsgBody.setHoverHeight(et_hover_height.getText().toString());
+                //航线名称存入数据库
+                locationMsgBody.setRouteName(et_title.getText().toString());
+                //创建时间
+                locationMsgBody.setCreateTime(getTime(System.currentTimeMillis()));
+                // 保存当前地址
+                locationMsgBody.setLocation(currentAddress);
+                locationMsgBody.setId(String.valueOf(System.currentTimeMillis()));
                 long insert = SQLiteHelper.with(this).insert(locationMsgBody);
-                if (insert > 0){
+                if (insert > 0) {
                     Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
                     // 加一个延迟1秒钟
                     Handler handler = new Handler();
@@ -380,6 +459,14 @@ public class CreateAty extends MyActivity
                 break;
         }
     }
+
+    //获取时间戳转换
+    public static String getTime(long time) {
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat sdr = new SimpleDateFormat("MM/dd/yyyy");
+        return sdr.format(new Date(time));
+    }
+
 
     /*  @Override
       protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -649,6 +736,21 @@ public class CreateAty extends MyActivity
         locationMsgBody.setThumbnail_path(ImageHelper.bitmapToBase64(bitmap));
     }
 
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        switch (checkedId) {
+            case R.id.cb_left:
+                cb_left.setBackgroundColor(getResources().getColor(R.color.blue));
+                break;
+            case R.id.cb_right:
+                cb_right.setBackgroundColor(getResources().getColor(R.color.blue));
+                break;
+            default:
+                break;
+        }
+
+    }
+
     //设置定位监听器
     public class MyLocationListener implements BDLocationListener {
         @Override
@@ -683,6 +785,16 @@ public class CreateAty extends MyActivity
                 currentStartLatSize = latLng.latitude;
                 currentStartLngSize = latLng.longitude;
             }
+            Log.d(TAG, "---->" + location.getAddress().address + "---->" + location.getDistrict());
+            //位置信息保存到数据库
+            /**
+             *1.国家:location.getCountry()
+             * 2.城市:location.getCity()
+             * 3.区域(例：南岸区)：location.getDistrict()
+             * 4.地点(例：桃源路)：location.getStreet()
+             * 5.详细地址：location.getAddrStr()
+             */
+            currentAddress = location.getCity() + location.getDistrict() + location.getStreet();
         }
 
     }
@@ -769,6 +881,7 @@ public class CreateAty extends MyActivity
         addEditTextListener(endLngView);
         addEditTextListener(et_hover_time);
         addEditTextListener(et_hover_height);
+        addEditTextListener(et_title);
     }
 
     public void addEditTextListener(EditText editText) {
@@ -819,9 +932,20 @@ public class CreateAty extends MyActivity
                     }
                     setMarker(true, currentEndLatSize, currentEdnLngSize, R.mipmap.end);
                 } else if (editText == et_hover_height) {
+                    if (TextUtils.isEmpty(et_hover_height.getText().toString())) {
+                        return;
+                    }
                     sb_Hover_height.setProgress(Integer.parseInt(s.toString()));
+
                 } else if (editText == et_hover_time) {
+                    if (TextUtils.isEmpty(et_hover_time.getText().toString())) {
+                        return;
+                    }
                     sb_Hover_time.setProgress(Integer.parseInt(s.toString()));
+                } else if (editText == et_title) {
+                    if (TextUtils.isEmpty(et_title.getText().toString())) {
+                        return;
+                    }
                 } else {
                     throw new RuntimeException("This is Error");
                 }

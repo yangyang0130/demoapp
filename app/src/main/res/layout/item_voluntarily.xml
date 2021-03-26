@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_nav_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginEnd="10dp"
@@ -8,8 +9,9 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_map"
-        android:layout_width="200dp"
+        android:layout_width="180dp"
         android:layout_height="200dp"
+        android:scaleType="fitXY"
         android:background="@drawable/bg_pull"
         android:src="@mipmap/map"/>
 
@@ -29,21 +31,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/iv_map"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginBottom="40dp"
         android:layout_toRightOf="@+id/iv_map"
         android:text="更新时间：3/18/2021"
         android:textColor="#616161"
-        android:textSize="12sp"/>
+        android:textSize="10sp"/>
 
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <com.yangyang.unmanneddrone.View.MarqueeTextView
         android:id="@+id/tv_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/iv_map"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginTop="10dp"
+        android:ellipsize="marquee"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_marginBottom="10dp"
         android:layout_toRightOf="@+id/iv_map"
         android:text="重庆市南岸区谢家湾轻轨站"

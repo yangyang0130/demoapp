@@ -1,9 +1,12 @@
 package com.yangyang.unmanneddrone.Body;
 
-//航线库
-public class VoluntarilyBody {
+import java.io.Serializable;
 
-    private int map;
+//航线库
+public class VoluntarilyBody implements Serializable {
+
+    private String id;
+    private String map;
     private String title;
     private String update_time;
     private String location;
@@ -13,11 +16,19 @@ public class VoluntarilyBody {
 
     }
 
-    public int getMap() {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getMap() {
         return map;
     }
 
-    public void setMap(int map) {
+    public void setMap(String map) {
         this.map = map;
     }
 

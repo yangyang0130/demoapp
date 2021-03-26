@@ -1,22 +1,71 @@
 package com.yangyang.unmanneddrone.Body;
 
+//数据库
 public class LocationMsgBody {
 
+    private String id;
+
+    /**
+     * 航线名称
+     */
     private String routeName;
+    /**
+     * 创建时间
+     */
     private String createTime;
+    /**
+     * 悬停时间
+     */
     private String hoverTime;
+    /**
+     * 悬停高度
+     */
     private String hoverHeight;
+    /**
+     * 悬停朝向
+     */
     private String hover_direction;
+    /**
+     * 位置信息
+     */
     private String location;
+    /**
+     * 地图缩略图
+     */
     private String thumbnail_path;
+    /**
+     * 起点坐标值
+     */
 
     private String startLocation;
+    /**
+     * 起点经度
+     */
     private String startLat;
+    /**
+     * 起点纬度
+     */
     private String startLng;
+    /**
+     * 终点坐标值
+     */
     private String endLocation;
+    /**
+     * 终点经度
+     */
     private String endLat;
+    /**
+     * 终点纬度
+     */
     private String endLng;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getRouteName() {
         return routeName;
@@ -131,7 +180,7 @@ public class LocationMsgBody {
                 ", hoverHeight='" + hoverHeight + '\'' +
                 ", hover_direction='" + hover_direction + '\'' +
                 ", location='" + location + '\'' +
-                ", Thumbnail_path='" + thumbnail_path + '\'' +
+                // ", Thumbnail_path='" + thumbnail_path + '\'' +
                 ", startLocation='" + startLocation + '\'' +
                 ", startLat='" + startLat + '\'' +
                 ", startLng='" + startLng + '\'' +

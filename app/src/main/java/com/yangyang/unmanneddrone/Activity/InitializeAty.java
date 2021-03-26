@@ -57,7 +57,7 @@ public class InitializeAty extends MyActivity {
                 super.run();
                 while (index <= 100) {
                     try {
-                        Thread.sleep(1);
+                        Thread.sleep(10);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

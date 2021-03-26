@@ -47,8 +47,8 @@
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.yangyang.unmanneddrone.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_path" />
@@ -59,17 +59,15 @@
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="WBPITtItKcwOSBEgw9WhdCEHh5Et0l7W" />
 
-        <service android:name="com.baidu.location.f"
+        <service
+            android:name="com.baidu.location.f"
             android:enabled="true"
-            android:process=":remote"/>
+            android:process=":remote" />
 
         <activity
             android:name=".Activity.MainAty"
-            android:screenOrientation="landscape"/>
-
-        <activity
-            android:name=".Activity.MoreAty"
             android:screenOrientation="landscape" />
+
 
         <activity
             android:name=".Activity.MovementAty"
@@ -78,10 +76,14 @@
         <activity
             android:name=".Activity.CreateAty"
             android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
 
         <activity
             android:name=".Activity.VoluntarilyAty"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".Activity.AboutAty"
             android:screenOrientation="landscape" />
 
     </application>

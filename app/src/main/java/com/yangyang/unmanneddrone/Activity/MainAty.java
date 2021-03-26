@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.yangyang.unmanneddrone.R;
 import com.yangyang.unmanneddrone.View.TopPopWindow;
 import com.yangyang.unmanneddrone.base.MyActivity;
+import com.yangyang.unmanneddrone.helper.DoubleClickHelper;
 
 import java.util.PropertyResourceBundle;
 
@@ -52,6 +53,10 @@ public class MainAty extends MyActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        //屏蔽短时间内双击
+        if (DoubleClickHelper.isOnDoubleClick()){
+            return;
+        }
         switch (v.getId()) {
             case R.id.ib_hand_movement:
                 Intent intent_movement = new Intent(MainAty.this, MovementAty.class);
