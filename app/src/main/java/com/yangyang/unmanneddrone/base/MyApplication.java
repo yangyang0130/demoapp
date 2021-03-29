@@ -32,8 +32,9 @@ public class MyApplication extends Application {
      */
     private void initDB() {
         //excel数据表
+       // SQLiteHelper.with(this).dropTable(SelectionBody.class.getSimpleName());
         SQLiteHelper.with(this).createTable(SelectionBody.class);
-        //SQLiteHelper.with(this).dropTable(LocationMsgBody.class.getSimpleName());
+        // SQLiteHelper.with(this).dropTable(LocationMsgBody.class.getSimpleName());
         //航线库数据表
         SQLiteHelper.with(this).createTable(LocationMsgBody.class);
     }

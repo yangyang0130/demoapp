@@ -5,6 +5,8 @@ package com.yangyang.unmanneddrone.Body;
  */
 public class SelectionBody {
 
+    private String id;
+
     private String serialNum;
     /** 横坐标 */
     private String abscissa;
@@ -35,12 +37,21 @@ public class SelectionBody {
         this.ordinate = ordinate;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "SelectionBody{" +
                 "serialNum='" + serialNum + '\'' +
                 ", abscissa='" + abscissa + '\'' +
                 ", ordinate='" + ordinate + '\'' +
+                ", id='" + id + '\'' +
                 '}';
     }
 }

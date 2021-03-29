@@ -5,6 +5,8 @@ public class LocationMsgBody {
 
     private String id;
 
+    private String voluntarilyData;
+
     /**
      * 航线名称
      */
@@ -58,6 +60,14 @@ public class LocationMsgBody {
      * 终点纬度
      */
     private String endLng;
+
+    public String getVoluntarilyData() {
+        return voluntarilyData;
+    }
+
+    public void setVoluntarilyData(String voluntarilyData) {
+        this.voluntarilyData = voluntarilyData;
+    }
 
     public String getId() {
         return id;
@@ -174,13 +184,15 @@ public class LocationMsgBody {
     @Override
     public String toString() {
         return "LocationMsgBody{" +
-                "routeName='" + routeName + '\'' +
+                "id='" + id + '\'' +
+                ", voluntarilyData='" + voluntarilyData + '\'' +
+                ", routeName='" + routeName + '\'' +
                 ", createTime='" + createTime + '\'' +
                 ", hoverTime='" + hoverTime + '\'' +
                 ", hoverHeight='" + hoverHeight + '\'' +
                 ", hover_direction='" + hover_direction + '\'' +
                 ", location='" + location + '\'' +
-                // ", Thumbnail_path='" + thumbnail_path + '\'' +
+                //", thumbnail_path='" + thumbnail_path + '\'' +
                 ", startLocation='" + startLocation + '\'' +
                 ", startLat='" + startLat + '\'' +
                 ", startLng='" + startLng + '\'' +

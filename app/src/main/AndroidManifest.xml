@@ -86,6 +86,12 @@
             android:name=".Activity.AboutAty"
             android:screenOrientation="landscape" />
 
+        <activity
+            android:name=".Activity.MeasurementRecordAty"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".Activity.DetailedDataAty"
+            android:screenOrientation="landscape" />
     </application>
 
 </manifest>

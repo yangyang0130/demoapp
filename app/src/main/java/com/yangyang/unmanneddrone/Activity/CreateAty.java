@@ -56,18 +56,21 @@ import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.bumptech.glide.util.LogTime;
 import com.yangyang.tools.db.SQLiteHelper;
 import com.yangyang.tools.permission.OnPermission;
 import com.yangyang.tools.permission.Permission;
 import com.yangyang.tools.permission.XXPermissions;
 import com.yangyang.unmanneddrone.Body.LocationMsgBody;
 import com.yangyang.unmanneddrone.Body.SelectionBody;
+import com.yangyang.unmanneddrone.Body.VoluntarilyBody;
 import com.yangyang.unmanneddrone.R;
 import com.yangyang.unmanneddrone.View.RoundMenuView;
 import com.yangyang.unmanneddrone.base.MyActivity;
 import com.yangyang.unmanneddrone.helper.Constants;
 import com.yangyang.unmanneddrone.helper.DoubleClickHelper;
 import com.yangyang.unmanneddrone.helper.ExcelUtils;
+import com.yangyang.unmanneddrone.helper.IdHelper;
 import com.yangyang.unmanneddrone.helper.ImageHelper;
 
 import java.io.InputStream;
@@ -137,7 +140,7 @@ public class CreateAty extends MyActivity
     private RelativeLayout mapParentView;
     private ImageView excel;
     private RadioButton cb_left, cb_right;
-    private RadioGroup hover_direction;
+    private RadioGroup rg_direction;
 
 
     /**
@@ -202,8 +205,34 @@ public class CreateAty extends MyActivity
                 //在地图上绘制折线
                 //mPloyline 折线对象
                 Overlay mPolyline = mBaiduMap.addOverlay(mOverlayOptions);
-
-
+                if ("right".equals(msgBody.getHover_direction())) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            cb_right.setChecked(true);
+                        }
+                    });
+                }
+                if ("left".equals(msgBody.getHover_direction())) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            cb_left.setChecked(true);
+                        }
+                    });
+                }
+                // 设置导入可见
+                excel.setVisibility(TextUtils.isEmpty(msgBody.getVoluntarilyData()) ? View.GONE : View.VISIBLE);
+                String[] data = msgBody.getVoluntarilyData().split(",");
+                List<SelectionBody> selectionBodyList = new ArrayList<>();
+                for (String datum : data) {
+                    List<SelectionBody> bodyList = SQLiteHelper.with(this).query(SelectionBody.class,
+                            "select * from " + SelectionBody.class.getSimpleName() + " where id=" + datum);
+                    //
+                    selectionBodyList.addAll(bodyList);
+                }
+                //
+                Log.d(TAG, "---excel 数据--->" + selectionBodyList);
             }
         }
     }
@@ -245,7 +274,7 @@ public class CreateAty extends MyActivity
         excel = findViewById(R.id.excel);
         cb_left = findViewById(R.id.cb_left);
         cb_right = findViewById(R.id.cb_right);
-        hover_direction = findViewById(R.id.hover_direction);
+        rg_direction = findViewById(R.id.hover_direction);
 
 
         // 数据导入page
@@ -299,7 +328,7 @@ public class CreateAty extends MyActivity
         importDataButtonView.setOnClickListener(this);
         ib_save.setOnClickListener(this);
         leftRadioButtonView.setOnClickListener(this);
-        hover_direction.setOnCheckedChangeListener(this);
+        rg_direction.setOnCheckedChangeListener(this);
     }
 
     private void setInit() {
@@ -392,12 +421,10 @@ public class CreateAty extends MyActivity
                             @Override
                             public void hasPermission(List<String> granted, boolean all) {
                                 if (all) {
-//                                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-//                                    intent.addCategory("android.intent.category.DEFAULT");
-//                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                    intent.setType("*/*");
-//                                    startActivityForResult(intent, Constants.getInstance().FILE_REQUEST_CODE);
-
+                                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                                    intent.setType("*/*");
+                                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                                    startActivityForResult(intent, 1);
                                     // excel数据导入
                                     try {
                                         List<SelectionBody> selectionBodyList = new ArrayList<>();
@@ -406,15 +433,22 @@ public class CreateAty extends MyActivity
                                         Log.d(TAG, "--->" + excelDataList.size() + "--->" + excelDataList);
                                         // 暂存入数据库
                                         // SQLiteHelper.with(CreateAty.this).insert(excelDataList);
+                                        IdHelper idHelper = new IdHelper(1, 1, 1);
+                                        StringBuilder idBuilder = new StringBuilder();
                                         for (SelectionBody body : excelDataList) {
+                                            body.setId(String.valueOf(idHelper.nextId()));
+                                            idBuilder.append(body.getId()).append(",");
                                             SQLiteHelper.with(CreateAty.this).insert(body);
                                         }
+                                        locationMsgBody.setVoluntarilyData(idBuilder.toString());
                                         excel.setVisibility(View.VISIBLE);
                                         Toast.makeText(CreateAty.this, "已导入断面", Toast.LENGTH_SHORT).show();
                                     } catch (Exception e) {
                                         Log.e(TAG, "-----------_>" + e.toString());
                                         e.printStackTrace();
                                     }
+                                    List<SelectionBody> bodyList = SQLiteHelper.with(CreateAty.this).query(SelectionBody.class);
+                                    Log.d(TAG, "-----插入数据----->" + bodyList);
                                 }
                             }
 
@@ -738,17 +772,15 @@ public class CreateAty extends MyActivity
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        switch (checkedId) {
-            case R.id.cb_left:
-                cb_left.setBackgroundColor(getResources().getColor(R.color.blue));
-                break;
-            case R.id.cb_right:
-                cb_right.setBackgroundColor(getResources().getColor(R.color.blue));
-                break;
-            default:
-                break;
-        }
+        if (checkedId == cb_left.getId()) {
+            locationMsgBody.setHover_direction("left");
 
+        }
+        if (checkedId == cb_right.getId()) {
+            locationMsgBody.setHover_direction("right");
+        }
+        List<LocationMsgBody> locationMsgBodyList = SQLiteHelper.with(this).query(LocationMsgBody.class);
+        Log.d(TAG,"---------------数据库---------"+locationMsgBodyList);
     }
 
     //设置定位监听器

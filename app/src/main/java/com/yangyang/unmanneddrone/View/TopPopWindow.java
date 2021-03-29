@@ -9,11 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
-import android.widget.Toast;
 
 import com.yangyang.unmanneddrone.Activity.AboutAty;
-import com.yangyang.unmanneddrone.Activity.MainAty;
-import com.yangyang.unmanneddrone.Activity.VoluntarilyAty;
+import com.yangyang.unmanneddrone.Activity.MeasurementRecordAty;
 import com.yangyang.unmanneddrone.R;
 import com.yangyang.unmanneddrone.helper.DoubleClickHelper;
 
@@ -78,13 +76,16 @@ public class TopPopWindow extends PopupWindow implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         //屏蔽短时间内双击
-        if (DoubleClickHelper.isOnDoubleClick()){
+        if (DoubleClickHelper.isOnDoubleClick()) {
             return;
         }
         switch (view.getId()) {
             case R.id.ll_about:
-                Intent intent_about=new Intent(mContext,AboutAty.class);
+                Intent intent_about = new Intent(mContext, AboutAty.class);
                 mContext.startActivity(intent_about);
+            case R.id.ll_location:
+                MeasurementRecordAty.start(mContext);
+                break;
             default:
                 break;
         }
