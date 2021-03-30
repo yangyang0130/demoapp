@@ -2,30 +2,40 @@ package com.yangyang.unmanneddrone.Activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.yangyang.tools.db.SQLiteHelper;
 import com.yangyang.tools.permission.OnPermission;
 import com.yangyang.tools.permission.Permission;
 import com.yangyang.tools.permission.XXPermissions;
 import com.yangyang.unmanneddrone.Adapter.MeasurementAdapter;
 import com.yangyang.unmanneddrone.Body.ExcelDemoBean;
+import com.yangyang.unmanneddrone.Body.LocationMsgBody;
 import com.yangyang.unmanneddrone.Body.MeasurementBody;
+import com.yangyang.unmanneddrone.Body.SelectionBody;
 import com.yangyang.unmanneddrone.R;
+import com.yangyang.unmanneddrone.View.CustomEditTextDialog;
 import com.yangyang.unmanneddrone.base.MyActivity;
 import com.yangyang.unmanneddrone.helper.DoubleClickHelper;
 import com.yangyang.unmanneddrone.helper.ExcelUtil;
+import com.yangyang.unmanneddrone.helper.ExcelUtils;
+import com.yangyang.unmanneddrone.helper.IdHelper;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,6 +50,7 @@ public class MeasurementRecordAty extends MyActivity implements View.OnClickList
     private ImageView iv_back;
     private MeasurementAdapter measurementAdapter;
     private List<MeasurementBody> currentList;
+    private LocationMsgBody locationMsgBody;
 
     @Override
     protected void onCreate(@Nullable Bundle bundle) {
@@ -70,14 +81,81 @@ public class MeasurementRecordAty extends MyActivity implements View.OnClickList
         measurementAdapter.setListener(new MeasurementAdapter.Listener() {
             @Override
             public void itemOnClick(int position) {
-                 Intent intent = new Intent(MeasurementRecordAty.this, DetailedDataAty.class);
-                 startActivity(intent);
 
             }
 
             @Override
             public void editOnClick(int position) {
-                Toast.makeText(MeasurementRecordAty.this, "点击了修改-->" + position, Toast.LENGTH_SHORT).show();
+                final AlertDialog.Builder normalDialog =
+                        new AlertDialog.Builder(MeasurementRecordAty.this);
+                normalDialog.setMessage("修改");
+                normalDialog.setPositiveButton("导入断面数据",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                XXPermissions.with(MeasurementRecordAty.this)
+                                        .permission(Permission.Group.STORAGE)
+                                        .request(new OnPermission() {
+                                            @Override
+                                            public void hasPermission(List<String> granted, boolean all) {
+                                                if (all) {
+
+                                                    // excel数据导入
+                                                    try {
+                                                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                                                        intent.setType("*/*");
+                                                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                                                        startActivityForResult(intent, 1);
+                                                        List<SelectionBody> selectionBodyList = new ArrayList<>();
+                                                        InputStream inputStream = getAssets().open("selection_table.xlsx");
+                                                        List<SelectionBody> excelDataList = ExcelUtils.readExcel(inputStream, selectionBodyList);
+                                                        Log.d(TAG, "--->" + excelDataList.size() + "--->" + excelDataList);
+                                                        // 暂存入数据库
+                                                        // SQLiteHelper.with(CreateAty.this).insert(excelDataList);
+                                                        IdHelper idHelper = new IdHelper(1, 1, 1);
+                                                        StringBuilder idBuilder = new StringBuilder();
+                                                        for (SelectionBody body : excelDataList) {
+                                                            body.setId(String.valueOf(idHelper.nextId()));
+                                                            idBuilder.append(body.getId()).append(",");
+                                                            SQLiteHelper.with(MeasurementRecordAty.this).insert(body);
+                                                        }
+                                                        locationMsgBody.setVoluntarilyData(idBuilder.toString());
+                                                        Toast.makeText(MeasurementRecordAty.this, "已导入断面", Toast.LENGTH_SHORT).show();
+                                                    } catch (Exception e) {
+                                                        Log.e(TAG, "-----------_>" + e.toString());
+                                                        e.printStackTrace();
+                                                    }
+                                                    List<SelectionBody> bodyList = SQLiteHelper.with(MeasurementRecordAty.this).query(SelectionBody.class);
+                                                    Log.d(TAG, "-----插入数据----->" + bodyList);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void noPermission(List<String> denied, boolean never) {
+                                                Toast.makeText(MeasurementRecordAty.this, "当前权限不足,谢谢！", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                        });
+                normalDialog.setNegativeButton("修改水位",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //...To-do
+                                showDialogWaterLevel();
+                            }
+                        });
+
+                normalDialog.setNeutralButton("关闭",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // ...To-do
+                                dialog.dismiss();
+                            }
+                        });
+                // 显示
+                normalDialog.show();
             }
 
             @Override
@@ -90,7 +168,7 @@ public class MeasurementRecordAty extends MyActivity implements View.OnClickList
                                 if (all) {
                                     exportExcel(MeasurementRecordAty.this);
                                     Toast.makeText(MeasurementRecordAty.this, "已保存至"
-                                            + Environment.getExternalStoragePublicDirectory(DIRECTORY_DOCUMENTS).getAbsolutePath()+"/flowMeasurement",
+                                                    + Environment.getExternalStoragePublicDirectory(DIRECTORY_DOCUMENTS).getAbsolutePath() + "/flowMeasurement",
                                             Toast.LENGTH_SHORT).show();
                                 }
                             }
@@ -200,5 +278,26 @@ public class MeasurementRecordAty extends MyActivity implements View.OnClickList
             e.printStackTrace();
         }
         return str.charAt(0);
+    }
+
+    public void showDialogWaterLevel() {
+        final CustomEditTextDialog customDialog = new CustomEditTextDialog(this);
+        final EditText editText = (EditText) customDialog.getEditText();//方法在CustomDialog中实现
+        customDialog.setOnSureListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MeasurementRecordAty.this, "你点击了确定,输入的值为:" + editText.getText().toString(), Toast.LENGTH_SHORT).show();
+                customDialog.dismiss();
+            }
+        });
+        customDialog.setOnCanlceListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MeasurementRecordAty.this, "你点击了取消", Toast.LENGTH_SHORT).show();
+                customDialog.dismiss();
+            }
+        });
+        customDialog.setTile("请输入水位");
+        customDialog.show();
     }
 }
