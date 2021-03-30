@@ -59,16 +59,18 @@ public class MeasurementAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 mListener.itemOnClick(position);
             }
         });
+        // 下载
         dataViewHolder.downloadView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.itemOnClick(position);
+                mListener.downloadOnClick(position);
             }
         });
+        // 修改
         dataViewHolder.modifyView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.itemOnClick(position);
+                mListener.editOnClick(position);
             }
         });
 
@@ -99,7 +101,7 @@ public class MeasurementAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             averageVelocityView = itemView.findViewById(R.id.tv_average_velocity);
             measureTimeView = itemView.findViewById(R.id.tv_measure_time);
             flowView = itemView.findViewById(R.id.tv_flow);
-            llView = itemView.findViewById(R.id.ll_measurement);
+            llView = itemView.findViewById(R.id.ll_measurement_parent);
 
         }
 
@@ -110,6 +112,16 @@ public class MeasurementAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
          * item点击事件
          */
         void itemOnClick(int position);
+
+        /**
+         * item的修改
+         */
+        void editOnClick(int position);
+
+        /**
+         * item的下载
+         */
+        void downloadOnClick(int position);
     }
 
     private MeasurementAdapter.Listener mListener;

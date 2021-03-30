@@ -1,6 +1,7 @@
 package com.yangyang.unmanneddrone.base;
 
 import android.app.Application;
+import android.os.StrictMode;
 
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
@@ -12,6 +13,9 @@ public class MyApplication extends Application {
 
     @Override
     public void onCreate() {
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+        builder.detectFileUriExposure();
         super.onCreate();
 
         initSDK();
@@ -32,9 +36,9 @@ public class MyApplication extends Application {
      */
     private void initDB() {
         //excel数据表
-       // SQLiteHelper.with(this).dropTable(SelectionBody.class.getSimpleName());
+        // SQLiteHelper.with(this).dropTable(SelectionBody.class.getSimpleName());
         SQLiteHelper.with(this).createTable(SelectionBody.class);
-        // SQLiteHelper.with(this).dropTable(LocationMsgBody.class.getSimpleName());
+//         SQLiteHelper.with(this).dropTable(LocationMsgBody.class.getSimpleName());
         //航线库数据表
         SQLiteHelper.with(this).createTable(LocationMsgBody.class);
     }

@@ -102,7 +102,7 @@ public class VoluntarilyAty extends MyActivity implements View.OnClickListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 SQLiteHelper.with(VoluntarilyAty.this).delete(LocationMsgBody.class,
-                                        "id = " + voluntarilyAdapter.getList().get(position).getId(), null);
+                                        " id = " + voluntarilyAdapter.getList().get(position).getId(), null);
                                 voluntarilyAdapter.removeAtIndex(position);
                                 Toast.makeText(VoluntarilyAty.this, "删除成功", Toast.LENGTH_SHORT).show();
                             }

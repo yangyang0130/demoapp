@@ -33,9 +33,7 @@ dependencies {
     // 图片加载框架：https://github.com/bumptech/glide
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation files('libs/jxl-2.6.12.jar')
     implementation files('libs/poi-3.12-android-a.jar')
-    // 百度地图依赖包
-
-
-
+    //
 }

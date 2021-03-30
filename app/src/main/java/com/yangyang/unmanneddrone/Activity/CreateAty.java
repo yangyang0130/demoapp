@@ -156,6 +156,7 @@ public class CreateAty extends MyActivity
     //数据库
     private LocationMsgBody locationMsgBody;
     private String currentAddress;
+    private String msgId;
 
 
     @Override
@@ -181,6 +182,7 @@ public class CreateAty extends MyActivity
             // 把数据填充到页面上
             if (msgBodyList.size() != 0) {
                 LocationMsgBody msgBody = msgBodyList.get(0);
+                msgId = msgBody.getId();
                 et_title.setText(msgBody.getRouteName());
                 startLatView.setText(msgBody.getStartLat());
                 startLngView.setText(msgBody.getStartLng());
@@ -421,12 +423,13 @@ public class CreateAty extends MyActivity
                             @Override
                             public void hasPermission(List<String> granted, boolean all) {
                                 if (all) {
-                                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                                    intent.setType("*/*");
-                                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                                    startActivityForResult(intent, 1);
+
                                     // excel数据导入
                                     try {
+                                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                                        intent.setType("*/*");
+                                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                                        startActivityForResult(intent, 1);
                                         List<SelectionBody> selectionBodyList = new ArrayList<>();
                                         InputStream inputStream = getAssets().open("selection_table.xlsx");
                                         List<SelectionBody> excelDataList = ExcelUtils.readExcel(inputStream, selectionBodyList);
@@ -475,19 +478,28 @@ public class CreateAty extends MyActivity
                 locationMsgBody.setCreateTime(getTime(System.currentTimeMillis()));
                 // 保存当前地址
                 locationMsgBody.setLocation(currentAddress);
-                locationMsgBody.setId(String.valueOf(System.currentTimeMillis()));
-                long insert = SQLiteHelper.with(this).insert(locationMsgBody);
-                if (insert > 0) {
-                    Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
-                    // 加一个延迟1秒钟
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            finish();
-                        }
-                    }, 1000);
+
+                if (TextUtils.isEmpty(msgId)){
+                    locationMsgBody.setId(String.valueOf(System.currentTimeMillis()));
+                    long insert = SQLiteHelper.with(this).insert(locationMsgBody);
+                    if (insert > 0) {
+                        Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+                    }
+                }else {
+                    locationMsgBody.setId(msgId);
+                    long update = SQLiteHelper.with(this).update(locationMsgBody, null, null);
+                    if (update > 0) {
+                        Toast.makeText(this, "修改成功", Toast.LENGTH_SHORT).show();
+                    }
                 }
+                // 加一个延迟1秒钟
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                    }
+                }, 1000);
                 break;
             default:
                 break;

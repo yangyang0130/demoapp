@@ -83,8 +83,10 @@ public class TopPopWindow extends PopupWindow implements View.OnClickListener {
             case R.id.ll_about:
                 Intent intent_about = new Intent(mContext, AboutAty.class);
                 mContext.startActivity(intent_about);
+                break;
             case R.id.ll_location:
-                MeasurementRecordAty.start(mContext);
+                Intent intent_data = new Intent(mContext, MeasurementRecordAty.class);
+                mContext.startActivity(intent_data);
                 break;
             default:
                 break;

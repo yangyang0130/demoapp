@@ -65,7 +65,6 @@ public class MainAty extends MyActivity implements View.OnClickListener {
             case R.id.ib_voluntarily:
                 Intent intent_voluntarily = new Intent(MainAty.this, VoluntarilyAty.class);
                 startActivity(intent_voluntarily);
-
                 break;
             case R.id.iv_more:
                 new TopPopWindow(MainAty.this).showAtBottom(mImageView_more);

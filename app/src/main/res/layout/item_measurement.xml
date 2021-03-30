@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_measurement_parent"
     android:layout_width="match_parent"
     android:layout_height="80dp"
     android:layout_marginTop="1dp"
     android:background="#ffffff"
-    android:id="@+id/ll_measurement"
     android:orientation="horizontal">
 
     <TextView
@@ -52,26 +52,29 @@
         android:textSize="15sp" />
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
         <ImageView
-            android:layout_gravity="center"
             android:id="@+id/iv_modify"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
             android:layout_centerInParent="true"
-            android:src="@drawable/ic_iv_modify"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="25dp" />
-        <ImageView
             android:layout_gravity="center"
-            android:id="@+id/iv_download"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_download"
-            android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="30dp" />
+            android:padding="5dp"
+            android:src="@drawable/ic_iv_modify" />
+
+        <ImageView
+            android:id="@+id/iv_download"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:padding="5dp"
+            android:src="@drawable/ic_download" />
     </LinearLayout>
 </LinearLayout>
