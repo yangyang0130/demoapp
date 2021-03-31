@@ -1,6 +1,5 @@
 package com.yangyang.unmanneddrone.View;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -50,21 +49,14 @@ public class TopPopWindow extends PopupWindow implements View.OnClickListener {
         ColorDrawable dw = new ColorDrawable(0x00000000);
         //设置SelectPicPopupWindow弹出窗体的背景
         this.setBackgroundDrawable(dw);
-        backgroundAlpha((Activity) mContext, 0.8f);//0.0-1.0
-        this.setOnDismissListener(new OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                backgroundAlpha((Activity) mContext, 1f);
-            }
-        });
-    }
-
-    //设置添加屏幕的背景透明度
-    public void backgroundAlpha(Activity context, float bgAlpha) {
-        WindowManager.LayoutParams lp = context.getWindow().getAttributes();
-        lp.alpha = bgAlpha;
-        context.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        context.getWindow().setAttributes(lp);
+//        backgroundAlpha((Activity) mContext, 0.8f);//0.0-1.0
+//        this.setOnDismissListener(new OnDismissListener() {
+//            @Override
+//            public void onDismiss() {
+//                backgroundAlpha((Activity) mContext, 1f);
+//
+//            }
+//        });
     }
 
     public void showAtBottom(View view) {
@@ -81,12 +73,16 @@ public class TopPopWindow extends PopupWindow implements View.OnClickListener {
         }
         switch (view.getId()) {
             case R.id.ll_about:
+                // 关于
                 Intent intent_about = new Intent(mContext, AboutAty.class);
                 mContext.startActivity(intent_about);
+                this.dismiss();
                 break;
             case R.id.ll_location:
+                // 测量
                 Intent intent_data = new Intent(mContext, MeasurementRecordAty.class);
                 mContext.startActivity(intent_data);
+                this.dismiss();
                 break;
             default:
                 break;

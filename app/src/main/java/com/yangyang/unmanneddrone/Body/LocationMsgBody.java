@@ -61,6 +61,21 @@ public class LocationMsgBody {
      */
     private String endLng;
 
+    /**
+     * 间隔设置
+     *
+     */
+    private String numInterval;
+
+
+    public String getNumInterval() {
+        return numInterval;
+    }
+
+    public void setNumInterval(String numInterval) {
+        this.numInterval = numInterval;
+    }
+
     public String getVoluntarilyData() {
         return voluntarilyData;
     }
@@ -192,13 +207,14 @@ public class LocationMsgBody {
                 ", hoverHeight='" + hoverHeight + '\'' +
                 ", hover_direction='" + hover_direction + '\'' +
                 ", location='" + location + '\'' +
-                //", thumbnail_path='" + thumbnail_path + '\'' +
+                ", thumbnail_path='" + thumbnail_path + '\'' +
                 ", startLocation='" + startLocation + '\'' +
                 ", startLat='" + startLat + '\'' +
                 ", startLng='" + startLng + '\'' +
                 ", endLocation='" + endLocation + '\'' +
                 ", endLat='" + endLat + '\'' +
                 ", endLng='" + endLng + '\'' +
+                ", numInterval='" + numInterval + '\'' +
                 '}';
     }
 }

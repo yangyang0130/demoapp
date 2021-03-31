@@ -1,20 +1,19 @@
 package com.yangyang.unmanneddrone.Activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.yangyang.unmanneddrone.R;
 import com.yangyang.unmanneddrone.View.TopPopWindow;
 import com.yangyang.unmanneddrone.base.MyActivity;
 import com.yangyang.unmanneddrone.helper.DoubleClickHelper;
-
-import java.util.PropertyResourceBundle;
 
 //首页
 public class MainAty extends MyActivity implements View.OnClickListener {
@@ -23,6 +22,7 @@ public class MainAty extends MyActivity implements View.OnClickListener {
     private ImageButton mImageButton_voluntarily;
     private ImageView mImageView_status;
     private TextView mTextView_status;
+    private TopPopWindow popWindow;
 
 
     @Override
@@ -40,7 +40,6 @@ public class MainAty extends MyActivity implements View.OnClickListener {
         mImageView_more = findViewById(R.id.iv_more);
         mImageView_status = findViewById(R.id.iv_status);
         mTextView_status = findViewById(R.id.tv_status);
-
     }
 
     private void OnClickListener() {
@@ -51,29 +50,57 @@ public class MainAty extends MyActivity implements View.OnClickListener {
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onClick(View v) {
         //屏蔽短时间内双击
-        if (DoubleClickHelper.isOnDoubleClick()){
+        if (DoubleClickHelper.isOnDoubleClick()) {
             return;
         }
         switch (v.getId()) {
             case R.id.ib_hand_movement:
+                // 手动测量
                 Intent intent_movement = new Intent(MainAty.this, MovementAty.class);
                 startActivity(intent_movement);
                 break;
             case R.id.ib_voluntarily:
+                // 航线测量
                 Intent intent_voluntarily = new Intent(MainAty.this, VoluntarilyAty.class);
                 startActivity(intent_voluntarily);
                 break;
             case R.id.iv_more:
-                new TopPopWindow(MainAty.this).showAtBottom(mImageView_more);
+                // 关于
+                popWindow = new TopPopWindow(MainAty.this);
+                popWindow.showAtBottom(mImageView_more);
+                showIcon();
+                popWindow.setOnDismissListener(this::showIcon);
+                popWindow.setTouchInterceptor((v1, event) -> {
+                    if (event.getY() >= 0) {//PopupWindow内部的事件
+                        return false;
+                    }
+                    // 点击外部,弹窗消失
+                    popWindow.dismiss();
+                    return true;
+                });
                 break;
-
             default:
                 break;
-
         }
+    }
 
+    private void showIcon() {
+        backgroundAlpha((popWindow.isShowing() ? 0.5f : 1.0f));
+        Glide.with(MainAty.this)
+                .asBitmap()
+                .load(popWindow.isShowing() ? R.drawable.ic_cancel : R.drawable.ic_more)
+                .into(mImageView_more);
+    }
+
+    //设置添加屏幕的背景透明度
+    public void backgroundAlpha(float bgAlpha) {
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.alpha = bgAlpha;
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        getWindow().setAttributes(lp);
     }
 }

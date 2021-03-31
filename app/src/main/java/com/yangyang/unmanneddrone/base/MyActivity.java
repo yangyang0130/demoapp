@@ -1,6 +1,7 @@
 package com.yangyang.unmanneddrone.base;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -9,12 +10,11 @@ import android.view.WindowManager;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.yangyang.unmanneddrone.R;
-
-public class MyActivity extends AppCompatActivity{
+public class MyActivity extends AppCompatActivity {
 
     public String TAG = this.getClass().getSimpleName();
 
+    private Context mContext;
 
     /**
      * 加载对话框
@@ -73,7 +73,14 @@ public class MyActivity extends AppCompatActivity{
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
 
+        /*
+        1, 点击toast
+        2, 判断当前toast的个数, 以及显示所依赖的Activity
+         */
+    }
 
+    public Context getContext() {
+        return getBaseContext();
     }
 
     /**

@@ -2,8 +2,11 @@ package com.yangyang.unmanneddrone.View;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,13 +31,10 @@ public class CustomEditTextDialog extends Dialog {
     //初始化
     public void initView() {
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_input, null);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        view.setLayoutParams(params);
-        title = (TextView) view.findViewById(R.id.title);
-        editText = (EditText) view.findViewById(R.id.edittext);
-        btnSure = (TextView) view.findViewById(R.id.dialog_confirm_sure);
-        btnCancle = (TextView) view.findViewById(R.id.dialog_confirm_cancle);
+        title = view.findViewById(R.id.title);
+        editText = view.findViewById(R.id.edittext);
+        btnSure = view.findViewById(R.id.dialog_confirm_sure);
+        btnCancle = view.findViewById(R.id.dialog_confirm_cancle);
         super.setContentView(view);
     }
 

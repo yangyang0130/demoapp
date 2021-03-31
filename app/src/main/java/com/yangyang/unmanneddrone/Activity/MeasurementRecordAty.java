@@ -4,10 +4,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -35,6 +39,7 @@ import com.yangyang.unmanneddrone.helper.ExcelUtils;
 import com.yangyang.unmanneddrone.helper.IdHelper;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -81,6 +86,8 @@ public class MeasurementRecordAty extends MyActivity implements View.OnClickList
         measurementAdapter.setListener(new MeasurementAdapter.Listener() {
             @Override
             public void itemOnClick(int position) {
+                Intent intentItem = new Intent(MeasurementRecordAty.this, DetailedDataAty.class);
+                startActivity(intentItem);
 
             }
 
@@ -103,30 +110,13 @@ public class MeasurementRecordAty extends MyActivity implements View.OnClickList
                                                     // excel数据导入
                                                     try {
                                                         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                                                        intent.setType("*/*");
+                                                        intent.setType("application/vnd.ms-excel");
                                                         intent.addCategory(Intent.CATEGORY_OPENABLE);
                                                         startActivityForResult(intent, 1);
-                                                        List<SelectionBody> selectionBodyList = new ArrayList<>();
-                                                        InputStream inputStream = getAssets().open("selection_table.xlsx");
-                                                        List<SelectionBody> excelDataList = ExcelUtils.readExcel(inputStream, selectionBodyList);
-                                                        Log.d(TAG, "--->" + excelDataList.size() + "--->" + excelDataList);
-                                                        // 暂存入数据库
-                                                        // SQLiteHelper.with(CreateAty.this).insert(excelDataList);
-                                                        IdHelper idHelper = new IdHelper(1, 1, 1);
-                                                        StringBuilder idBuilder = new StringBuilder();
-                                                        for (SelectionBody body : excelDataList) {
-                                                            body.setId(String.valueOf(idHelper.nextId()));
-                                                            idBuilder.append(body.getId()).append(",");
-                                                            SQLiteHelper.with(MeasurementRecordAty.this).insert(body);
-                                                        }
-                                                        locationMsgBody.setVoluntarilyData(idBuilder.toString());
-                                                        Toast.makeText(MeasurementRecordAty.this, "已导入断面", Toast.LENGTH_SHORT).show();
                                                     } catch (Exception e) {
                                                         Log.e(TAG, "-----------_>" + e.toString());
                                                         e.printStackTrace();
                                                     }
-                                                    List<SelectionBody> bodyList = SQLiteHelper.with(MeasurementRecordAty.this).query(SelectionBody.class);
-                                                    Log.d(TAG, "-----插入数据----->" + bodyList);
                                                 }
                                             }
 
@@ -193,6 +183,39 @@ public class MeasurementRecordAty extends MyActivity implements View.OnClickList
         }
         measurementAdapter.setList(currentList);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) {
+            return;
+        }
+        if (requestCode == 1) {
+            Uri uri = data.getData();
+            try {
+                InputStream inStream = getContentResolver().openInputStream(uri);
+                List<SelectionBody> selectionBodyList = new ArrayList<>();
+                List<SelectionBody> excelDataList = ExcelUtils.readExcel(inStream, selectionBodyList);
+                Log.d(TAG, "--->" + excelDataList.size() + "--->" + excelDataList);
+                // 暂存入数据库
+                // SQLiteHelper.with(CreateAty.this).insert(excelDataList);
+                IdHelper idHelper = new IdHelper(1, 1, 1);
+                StringBuilder idBuilder = new StringBuilder();
+                for (SelectionBody body : excelDataList) {
+                    body.setId(String.valueOf(idHelper.nextId()));
+                    idBuilder.append(body.getId()).append(",");
+                    SQLiteHelper.with(MeasurementRecordAty.this).insert(body);
+                }
+                locationMsgBody.setVoluntarilyData(idBuilder.toString());
+                Toast.makeText(MeasurementRecordAty.this, "已导入断面", Toast.LENGTH_SHORT).show();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            List<SelectionBody> bodyList = SQLiteHelper.with(MeasurementRecordAty.this).query(SelectionBody.class);
+            Log.d(TAG, "-----插入数据----->" + bodyList);
+        }
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -299,5 +322,15 @@ public class MeasurementRecordAty extends MyActivity implements View.OnClickList
         });
         customDialog.setTile("请输入水位");
         customDialog.show();
+
+        Window dialogWindow = customDialog.getWindow();
+        dialogWindow.setBackgroundDrawableResource(android.R.color.transparent);
+        dialogWindow.setGravity(Gravity.CENTER);
+        WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+        lp.width = 600;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.y = 0;
+        dialogWindow.setAttributes(lp);
+
     }
 }
