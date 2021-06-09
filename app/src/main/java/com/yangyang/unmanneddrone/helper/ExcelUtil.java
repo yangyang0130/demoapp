@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.yangyang.unmanneddrone.Body.ExcelDemoBean;
+import com.yangyang.unmanneddrone.body.ExcelDemoBody;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +23,7 @@ import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
-
+//将数据保存为excel工具类
 public class ExcelUtil {
 
     private static WritableFont arial14font = null;
@@ -129,7 +129,7 @@ public class ExcelUtil {
 
                 int size = objList.size();
                 for (int j = 0; j < size; j++) {
-                    ExcelDemoBean excelDemoBean = (ExcelDemoBean) objList.get(j);
+                    ExcelDemoBody excelDemoBean = (ExcelDemoBody) objList.get(j);
                     List<String> list = new ArrayList<>();
                     list.add(excelDemoBean.getSerialNum());
                     list.add(String.valueOf(excelDemoBean.getDistance()));

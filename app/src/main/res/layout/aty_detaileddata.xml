@@ -3,14 +3,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
-
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_weight="4"
+        android:layout_height="wrap_content">
     <ImageView
         android:id="@+id/iv_map"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="4"
         android:scaleType="centerCrop"/>
-
+        <ImageButton
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:padding="10dp"
+            android:background="#ffffff"
+            android:src="@drawable/ic_black_back"
+            android:id="@+id/ib_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -19,7 +30,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="#000000"
             android:orientation="vertical">
@@ -27,15 +38,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="测量1" />
+                android:text="@string/Measurement" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="2020-05-20 13:20" />
@@ -43,10 +54,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="平均流速" />
+                android:text="@string/Average_velocity" />
 
         </LinearLayout>
 
@@ -61,15 +72,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="测量1" />
+                android:text="@string/Measurement" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="2020-05-20 13:20" />
@@ -77,17 +88,17 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="平均流速" />
+                android:text="@string/Average_velocity" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="@dimen/y1"
 
             android:layout_weight="1"
             android:background="#000000"
@@ -96,15 +107,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="测量1" />
+                android:text="@string/Measurement" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="2020-05-20 13:20" />
@@ -112,10 +123,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="平均流速" />
+                android:text="@string/Average_velocity" />
         </LinearLayout>
 
         <LinearLayout
@@ -129,15 +140,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="测量1" />
+                android:text="@string/Measurement" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="2020-05-20 13:20" />
@@ -145,10 +156,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="@dimen/x20"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="平均流速" />
+                android:text="@string/Average_velocity" />
         </LinearLayout>
 
     </LinearLayout>

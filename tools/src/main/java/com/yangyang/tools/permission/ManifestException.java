@@ -1,8 +1,8 @@
 package com.yangyang.tools.permission;
 
 /**
- * @author sxs
- * @date :2020/10/15
+ * @author yangyang
+ * @date :2021/4/1
  * @desc: 动态申请的权限没有在清单文件中注册会抛出的异常
  */
 class ManifestException extends RuntimeException {

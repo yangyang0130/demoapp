@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * @author sxs
- * @date :2020/10/15
+ * @author yangyang
+ * @date :2021/4/1
  * @desc: 权限请求工具类
  */
 public final class PermissionUtils {

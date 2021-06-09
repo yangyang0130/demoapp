@@ -8,8 +8,8 @@ import android.provider.Settings;
 import java.util.List;
 
 /**
- * @author sxs
- * @date :2020/10/15
+ * @author yangyang
+ * @date :2021/4/1
  * @desc: 权限设置页
  */
 public final class PermissionSettingPage {

@@ -11,39 +11,61 @@
         android:layout_weight="2"
         android:orientation="vertical">
 
-        <TextView
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:layout_weight="1"
-            android:text="航线名称"
-            android:textColor="#ffffff"
-            android:textSize="12sp">
-
-        </TextView>
-
         <LinearLayout
-            android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/x30"
+                android:layout_marginRight="@dimen/x15"
+                android:layout_weight="2"
+                android:gravity="center_vertical"
+                android:text="@string/Route_name"
+                android:textColor="#ffffff"
+                android:textSize="12sp">
+
+            </TextView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/x30"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/Interval_setting"
+                android:textColor="#ffffff"
+                android:textSize="12sp">
+
+            </TextView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/y5"
             android:layout_weight="1"
             android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/et_title"
                 android:layout_width="0dp"
+                android:imeOptions="actionDone"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="15dp"
+                android:layout_marginLeft="@dimen/x30"
+                android:layout_marginRight="@dimen/x15"
+                android:layout_marginBottom="@dimen/y5"
                 android:layout_toLeftOf="@+id/interval"
                 android:layout_weight="2"
                 android:background="@drawable/edit_background"
                 android:maxLines="1"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:layout_marginBottom="10dp"
+                android:paddingLeft="@dimen/x10"
+                android:paddingRight="@dimen/x10"
                 android:textColor="#03A9F4"
                 android:textSize="11sp">
 
@@ -53,15 +75,15 @@
                 android:id="@+id/interval"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginRight="30dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginRight="@dimen/x30"
+                android:imeOptions="actionDone"
+                android:layout_marginBottom="@dimen/y10"
                 android:layout_toRightOf="@+id/et_title"
                 android:layout_weight="1"
                 android:background="@drawable/edit_background"
-                android:hint="间隔设置"
                 android:inputType="number"
-                android:paddingLeft="15dp"
-                android:paddingRight="10dp"
+                android:paddingLeft="@dimen/x15"
+                android:paddingRight="@dimen/x10"
                 android:textColor="#03A9F4"
                 android:textSize="10sp" />
 
@@ -73,7 +95,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="@dimen/y2"
         android:background="#404040" />
 
     <LinearLayout
@@ -93,10 +115,10 @@
                 android:id="@+id/tv_start_Latitude"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginLeft="@dimen/x30"
+                android:layout_marginTop="@dimen/x10"
                 android:layout_weight="1"
-                android:text="起点经度"
+                android:text="@string/Longitude_of_origin"
                 android:textColor="#ffffff"
                 android:textSize="15sp">
 
@@ -106,17 +128,18 @@
                 android:id="@+id/et_start_Latitude"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="@dimen/x30"
+                android:layout_marginTop="@dimen/y5"
+                android:layout_marginRight="@dimen/x20"
+                android:layout_marginBottom="@dimen/y10"
                 android:layout_weight="1"
+                android:imeOptions="actionDone"
                 android:background="@drawable/edit_background"
                 android:inputType="numberDecimal"
                 android:maxLength="12"
                 android:maxLines="1"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
+                android:paddingLeft="@dimen/x10"
+                android:paddingRight="@dimen/x10"
                 android:singleLine="true"
                 android:textColor="#03A9F4"
                 android:textSize="11sp">
@@ -127,10 +150,10 @@
                 android:id="@+id/tv_start_Longitude"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginLeft="@dimen/x30"
+                android:layout_marginTop="@dimen/y10"
                 android:layout_weight="1"
-                android:text="起点纬度"
+                android:text="@string/Latitude_of_origin"
                 android:textColor="#ffffff"
                 android:textSize="15sp">
 
@@ -140,17 +163,18 @@
                 android:id="@+id/et_start_Longitude"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="@dimen/x30"
+                android:layout_marginTop="@dimen/y5"
+                android:layout_marginRight="@dimen/x20"
+                android:layout_marginBottom="@dimen/y10"
                 android:layout_weight="1"
                 android:background="@drawable/edit_background"
                 android:inputType="numberDecimal"
                 android:maxLength="12"
                 android:maxLines="1"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
+                android:paddingLeft="@dimen/x10"
+                android:imeOptions="actionDone"
+                android:paddingRight="@dimen/x10"
                 android:singleLine="true"
                 android:textColor="#03A9F4"
                 android:textSize="11sp">
@@ -164,17 +188,17 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <com.yangyang.unmanneddrone.View.RoundMenuView
+            <com.yangyang.unmanneddrone.view.RoundMenuView
                 android:id="@+id/roundView_one"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="@dimen/x140"
+                android:layout_height="@dimen/y140"
                 android:layout_centerInParent="true" />
         </RelativeLayout>
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="@dimen/y2"
         android:background="#404040" />
 
     <LinearLayout
@@ -194,10 +218,10 @@
                 android:id="@+id/tv_end_Latitude"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginLeft="@dimen/x30"
+                android:layout_marginTop="@dimen/y10"
                 android:layout_weight="1"
-                android:text="终点经度"
+                android:text="@string/End_longitude"
                 android:textColor="#ffffff"
                 android:textSize="15sp">
 
@@ -207,17 +231,18 @@
                 android:id="@+id/et_end_Latitude"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="@dimen/x30"
+                android:layout_marginTop="@dimen/y5"
+                android:layout_marginRight="@dimen/x20"
+                android:layout_marginBottom="@dimen/y10"
                 android:layout_weight="1"
                 android:background="@drawable/edit_background"
                 android:inputType="numberDecimal"
                 android:maxLength="12"
                 android:maxLines="1"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
+                android:paddingLeft="@dimen/x10"
+                android:imeOptions="actionDone"
+                android:paddingRight="@dimen/x10"
                 android:singleLine="true"
                 android:textColor="#03A9F4"
                 android:textSize="11sp" />
@@ -226,10 +251,10 @@
                 android:id="@+id/tv_end_Longitude"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginLeft="@dimen/x30"
+                android:layout_marginTop="@dimen/y10"
                 android:layout_weight="1"
-                android:text="终点纬度"
+                android:text="@string/End_latitude"
                 android:textColor="#ffffff"
                 android:textSize="15sp">
 
@@ -239,17 +264,18 @@
                 android:id="@+id/et_end_Longitude"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="@dimen/x30"
+                android:layout_marginTop="@dimen/y5"
+                android:layout_marginRight="@dimen/x20"
+                android:layout_marginBottom="@dimen/y10"
                 android:layout_weight="1"
                 android:background="@drawable/edit_background"
                 android:inputType="numberDecimal"
                 android:maxLength="12"
                 android:maxLines="1"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
+                android:paddingLeft="@dimen/x10"
+                android:imeOptions="actionDone"
+                android:paddingRight="@dimen/x10"
                 android:singleLine="true"
                 android:textColor="#03A9F4"
                 android:textSize="11sp" />
@@ -261,17 +287,17 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <com.yangyang.unmanneddrone.View.RoundMenuView
+            <com.yangyang.unmanneddrone.view.RoundMenuView
                 android:id="@+id/roundView_two"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="@dimen/x140"
+                android:layout_height="@dimen/y140"
                 android:layout_centerInParent="true" />
         </RelativeLayout>
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="@dimen/y2"
         android:background="#404040" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -280,7 +306,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="#2196F3"
-        android:text="下一步"
+        android:text="@string/next"
         android:textSize="15sp">
 
     </androidx.appcompat.widget.AppCompatButton>

@@ -29,15 +29,15 @@
     <application
         android:name=".base.MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_app_icon"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_app_icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.NoActionBar"
         tools:ignore="AllowBackup">
         <activity
-            android:name=".Activity.InitializeAty"
+            android:name=".activity.InitializeAty"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -68,33 +68,33 @@
             android:process=":remote" />
 
         <activity
-            android:name=".Activity.MainAty"
+            android:name=".activity.MainAty"
             android:screenOrientation="landscape" />
 
 
         <activity
-            android:name=".Activity.MovementAty"
+            android:name=".activity.MovementAty"
             android:screenOrientation="landscape" />
 
         <activity
-            android:name=".Activity.CreateAty"
+            android:name=".activity.CreateAty"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustPan" />
 
         <activity
-            android:name=".Activity.VoluntarilyAty"
+            android:name=".activity.VoluntarilyAty"
             android:screenOrientation="landscape" />
 
         <activity
-            android:name=".Activity.AboutAty"
+            android:name=".activity.AboutAty"
             android:screenOrientation="landscape" />
 
         <activity
-            android:name=".Activity.MeasurementRecordAty"
+            android:name=".activity.MeasurementRecordAty"
             android:screenOrientation="landscape" />
 
         <activity
-            android:name=".Activity.DetailedDataAty"
+            android:name=".activity.DetailedDataAty"
             android:screenOrientation="landscape" />
 
     </application>

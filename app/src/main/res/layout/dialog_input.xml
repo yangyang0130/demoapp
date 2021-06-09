@@ -15,9 +15,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:text="请输入水位" />
+            android:paddingTop="@dimen/y16"
+            android:paddingBottom="@dimen/y16"
+            android:text="@string/water_level" />
 
         <EditText
             android:id="@+id/edittext"
@@ -30,24 +30,24 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp">
+            android:paddingTop="@dimen/y16"
+            android:paddingBottom="@dimen/y16">
 
             <Button
                 android:id="@+id/dialog_confirm_cancle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="@dimen/x5"
                 android:layout_weight="1"
-                android:text="取消" />
+                android:text="@string/cancel" />
 
             <Button
                 android:id="@+id/dialog_confirm_sure"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="@dimen/x5"
                 android:layout_weight="1"
-                android:text="确定" />
+                android:text="@string/ok" />
         </LinearLayout>
     </LinearLayout>
 

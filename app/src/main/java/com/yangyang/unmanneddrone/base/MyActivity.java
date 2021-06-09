@@ -10,7 +10,9 @@ import android.view.WindowManager;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class MyActivity extends AppCompatActivity {
+import com.yangyang.unmanneddrone.helper.ClickAction;
+
+public class MyActivity extends AppCompatActivity implements ClickAction {
 
     public String TAG = this.getClass().getSimpleName();
 

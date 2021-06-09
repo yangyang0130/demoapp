@@ -1,8 +1,8 @@
 package com.yangyang.tools.permission;
 
 /**
- * @author sxs
- * @date :2020/8/17
+ * @author yangyang
+ * @date :2021/4/1
  * @description: 权限请求实体类
  */
 public final class Permission {
@@ -80,7 +80,6 @@ public final class Permission {
     public static final String USE_SIP = "android.permission.USE_SIP";
     /**
      * 处理拨出电话
-     *
      * @deprecated         在 Android 10 已经废弃，请直接使用 {@link Permission#ANSWER_PHONE_CALLS}
      */
     public static final String PROCESS_OUTGOING_CALLS = "android.permission.PROCESS_OUTGOING_CALLS";

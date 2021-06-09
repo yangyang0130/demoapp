@@ -22,14 +22,13 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="30dp"
-                android:text="悬停时间"
+                android:text="@string/Hover_time"
                 android:textSize="17sp" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginLeft="20dp"
             android:layout_weight="1">
 
             <SeekBar
@@ -37,17 +36,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="30dp"
+                android:max="60"
+                android:min="20"
                 android:layout_toLeftOf="@+id/et_hover_time"
                 android:progress="30" />
 
-            <com.yangyang.unmanneddrone.View.LastInputEditText
+            <com.yangyang.unmanneddrone.view.LastInputEditText
                 android:id="@+id/et_hover_time"
                 android:layout_width="40dp"
+                android:layout_marginRight="20dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="30dp"
                 android:background="@drawable/edit_background"
                 android:gravity="center"
                 android:inputType="number" />
@@ -77,32 +77,32 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="30dp"
-                android:text="悬停高度"
+                android:text="@string/Hover_height"
                 android:textSize="17sp" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginLeft="20dp"
             android:layout_weight="1">
 
             <SeekBar
+                android:min="-200"
+                android:max="500"
                 android:id="@+id/sb_Hover_height"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="30dp"
                 android:layout_toLeftOf="@+id/et_hover_height"
                 android:progress="50" />
 
-            <com.yangyang.unmanneddrone.View.LastInputEditText
+            <com.yangyang.unmanneddrone.view.LastInputEditText
                 android:id="@+id/et_hover_height"
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="30dp"
+                android:layout_marginRight="20dp"
                 android:background="@drawable/edit_background"
                 android:gravity="center"
                 android:inputType="number" />
@@ -132,7 +132,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="30dp"
-                android:text="悬停朝向"
+                android:text="@string/Hover_heading"
                 android:textSize="17sp" />
         </RelativeLayout>
 
@@ -145,22 +145,26 @@
                 android:id="@+id/hover_direction"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="30dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:orientation="horizontal">
 
                 <RadioButton
                     android:id="@+id/cb_left"
-                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="10dp"
                     android:background="@drawable/edit_background"
                     android:paddingHorizontal="7dp"
                     android:paddingVertical="3dp"
-                    android:text="航线左侧" />
+                    android:checked="true"
+                    android:text="@string/Hover_left" />
 
                 <RadioButton
                     android:id="@+id/cb_right"
-                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="20dp"
                     android:layout_marginBottom="10dp"
@@ -168,7 +172,7 @@
                     android:background="@drawable/edit_background"
                     android:paddingHorizontal="7dp"
                     android:paddingVertical="3dp"
-                    android:text="航线右侧" />
+                    android:text="@string/Hover_right" />
             </RadioGroup>
 
 
@@ -204,7 +208,7 @@
             android:layout_marginRight="20dp"
             android:background="@drawable/edit_background"
             android:paddingHorizontal="10dp"
-            android:text="导入断面数据" />
+            android:text="@string/Import_section_data" />
 
         <ImageView
             android:layout_width="wrap_content"

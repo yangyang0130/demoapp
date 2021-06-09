@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.os.Build;
 
 /**
- * @author sxs
- * @date :2020/10/15
+ * @author yangyang
+ * @date :2021/4/1
  * @desc: 国产手机具体的权限设置页（兼容大部分国产手机）
  */
 public class PermissionDetailsPage {

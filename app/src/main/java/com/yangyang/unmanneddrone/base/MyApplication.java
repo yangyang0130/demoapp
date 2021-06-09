@@ -6,8 +6,8 @@ import android.os.StrictMode;
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
 import com.yangyang.tools.db.SQLiteHelper;
-import com.yangyang.unmanneddrone.Body.LocationMsgBody;
-import com.yangyang.unmanneddrone.Body.SelectionBody;
+import com.yangyang.unmanneddrone.body.LocationMsgBody;
+import com.yangyang.unmanneddrone.body.SelectionBody;
 
 public class MyApplication extends Application {
 

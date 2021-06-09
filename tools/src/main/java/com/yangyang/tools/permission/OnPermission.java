@@ -3,8 +3,8 @@ package com.yangyang.tools.permission;
 import java.util.List;
 
 /**
- * @author sxs
- * @date :2020/8/17
+ * @author yangyang
+ * @date :2021/4/1
  * @description: 权限请求结果回调接口
  */
 public interface OnPermission {

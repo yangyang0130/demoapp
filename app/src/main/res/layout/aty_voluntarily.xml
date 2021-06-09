@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="@dimen/x20"
             android:src="@mipmap/back">
 
         </ImageView>
@@ -39,8 +39,8 @@
         android:id="@+id/rlv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginVertical="20dp"
+        android:layout_marginHorizontal="@dimen/x20"
+        android:layout_marginVertical="@dimen/y20"
         app:spanCount="2">
 
     </androidx.recyclerview.widget.RecyclerView>

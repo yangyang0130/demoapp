@@ -24,9 +24,18 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_image"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
+                android:layout_width="@dimen/x200"
+                android:layout_height="@dimen/y200"
                 android:layout_centerInParent="true"/>
+            <ImageButton
+                android:id="@+id/ib_back"
+                android:background="@drawable/bg_location"
+                android:layout_marginTop="10dp"
+                android:padding="10dp"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/ic_black_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/ib_location"
@@ -35,10 +44,10 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
-                android:layout_marginStart="10dp"
+                android:layout_margin="@dimen/x10"
+                android:layout_marginStart="@dimen/x10"
                 android:background="@drawable/bg_location"
-                android:padding="10dp"
+                android:padding="@dimen/x10"
                 android:src="@mipmap/ib_location" />
 
             <androidx.appcompat.widget.AppCompatImageButton
@@ -46,8 +55,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/ib_start"
-                android:layout_margin="10dp"
-                android:layout_marginStart="10dp"
+                android:layout_margin="@dimen/x10"
+                android:layout_marginStart="@dimen/x10"
                 android:background="@drawable/bg_location"
                 android:src="@drawable/ib_save"
                 android:visibility="gone" />
@@ -58,16 +67,16 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
-                android:layout_marginStart="10dp"
+                android:layout_margin="@dimen/x10"
+                android:layout_marginStart="@dimen/x10"
                 android:background="@drawable/bg_location"
                 android:src="@drawable/ic_btn_start"
                 android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_arrow_map"
-                android:layout_width="30dp"
-                android:layout_height="50dp"
+                android:layout_width="@dimen/x30"
+                android:layout_height="@dimen/y50"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="30dp"
                 android:background="@drawable/bg_map_direction"

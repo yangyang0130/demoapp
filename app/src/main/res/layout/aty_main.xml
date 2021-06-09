@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="#ffffff"
     android:orientation="vertical"
-    tools:context=".Activity.MainAty">
+    tools:context=".activity.MainAty">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -17,9 +17,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="@dimen/y10"
+            android:layout_marginRight="@dimen/x20"
+            android:layout_marginBottom="@dimen/y10"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_more" />
 
@@ -34,10 +34,10 @@
             android:id="@+id/Ll_ImageButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="@dimen/x20"
+            android:layout_marginTop="@dimen/y10"
+            android:layout_marginRight="@dimen/x20"
+            android:layout_marginBottom="@dimen/y10"
             android:background="#ffffff"
             android:orientation="horizontal">
 
@@ -45,7 +45,7 @@
                 android:id="@+id/ib_hand_movement"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginRight="10dp"
+                android:layout_marginRight="@dimen/x10"
                 android:layout_weight="1"
                 android:background="#ffffff"
                 android:scaleType="fitXY"
@@ -57,7 +57,7 @@
                 android:id="@+id/ib_voluntarily"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="@dimen/x10"
                 android:layout_weight="1"
                 android:background="#ffffff"
                 android:scaleType="fitXY"
@@ -71,20 +71,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/Ll_ImageButton"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginRight="60dp"
+            android:layout_marginLeft="@dimen/x50"
+            android:layout_marginTop="@dimen/y10"
+            android:layout_marginRight="@dimen/x60"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="@dimen/y40"
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="@dimen/x20"
+                    android:layout_height="@dimen/x20"
                     android:src="@mipmap/airway">
 
                 </ImageView>
@@ -93,9 +93,9 @@
                     android:id="@+id/tv_hand_movement"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginLeft="@dimen/x5"
                     android:layout_weight="1"
-                    android:text="手动测量"
+                    android:text="@string/tv_hand_movement"
                     android:textColor="#000000">
 
                 </TextView>
@@ -103,13 +103,13 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="80dp"
+                    android:layout_marginLeft="@dimen/x80"
                     android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="@dimen/x20"
+                        android:layout_height="@dimen/y20"
                         android:src="@mipmap/voluntarily">
 
                     </ImageView>
@@ -118,9 +118,9 @@
                         android:id="@+id/tv_voluntarily"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginLeft="@dimen/x5"
                         android:layout_weight="1"
-                        android:text="航线测量"
+                        android:text="@string/tv_voluntarily"
                         android:textColor="#000000">
 
                     </TextView>
@@ -140,7 +140,7 @@
             android:layout_width="10dp"
             android:layout_height="10dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="@dimen/x30"
             android:background="@drawable/status_start_bg" />
 
         <TextView
@@ -148,10 +148,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="@dimen/x10"
             android:layout_toRightOf="@+id/iv_status"
             android:gravity="center_vertical"
-            android:text="设备未连接"
+            android:text="@string/tv_status"
             android:textColor="#000000"
             android:textSize="10sp">
 

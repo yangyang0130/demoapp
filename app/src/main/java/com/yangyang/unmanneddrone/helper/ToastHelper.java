@@ -4,6 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.Gravity;
 import android.widget.Toast;
+/**
+ * toast提示工具类
+ */
 
 public class ToastHelper {
 

@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author sxs
- * @date :2020/10/15
+ * @author yangyang
+ * @date :2021/4/1
  * @desc: 权限处理请求类
  */
 @TargetApi(Build.VERSION_CODES.M)
@@ -136,6 +136,8 @@ public final class PermissionFragment extends Fragment {
         }
     }
 
+    static int location_fail_count = 0;
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         SoftReference<OnPermission> reference = sCallbacks.get(requestCode);
@@ -151,10 +153,17 @@ public final class PermissionFragment extends Fragment {
         for (int i = 0; i < permissions.length; i++) {
 
             String permission = permissions[i];
+            // 定位权限失败的仅在运行时的情况
+            for (String location : Permission.Group.LOCATION) {
+                if (permission.equals(location)){
+                    ++location_fail_count;
+                }
+            }
 
             if (PermissionUtils.isSpecialPermission(permission)) {
                 // 如果这个权限是特殊权限，那么就重新进行权限检测
-                grantResults[i] = PermissionUtils.isPermissionGranted(getActivity(), permission) ? PackageManager.PERMISSION_GRANTED : PackageManager.PERMISSION_DENIED;
+                grantResults[i] = PermissionUtils.isPermissionGranted(getActivity(), permission)
+                        ? PackageManager.PERMISSION_GRANTED : PackageManager.PERMISSION_DENIED;
                 continue;
             }
 
@@ -181,9 +190,18 @@ public final class PermissionFragment extends Fragment {
 
         // 获取授予权限
         List<String> succeedPermissions = PermissionUtils.getGrantedPermission(permissions, grantResults);
+        int permissionSize = succeedPermissions.size();
+        if (permissionSize != permissions.length){
+            // 如果是定位权限
+            if (location_fail_count == 3){
+                ++permissionSize;
+            }
+        }
+
         // 如果请求成功的权限集合大小和请求的数组一样大时证明权限已经全部授予
-        if (succeedPermissions.size() == permissions.length) {
+        if (permissionSize == permissions.length) {
             // 代表申请的所有的权限都授予了
+            location_fail_count = 0;
             callback.hasPermission(succeedPermissions, true);
         } else {
 

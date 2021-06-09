@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ll_measurement_parent"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
+    android:layout_height="@dimen/y80"
     android:layout_marginTop="1dp"
     android:background="#ffffff"
     android:orientation="horizontal">
@@ -14,7 +14,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="测量名称"
+        android:text="@string/Measurement_name"
         android:textColor="#000000"
         android:textSize="15sp" />
 
@@ -25,7 +25,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="平均流速"
+        android:text="@string/Average_velocity"
         android:textColor="#000000"
         android:textSize="15sp" />
 
@@ -36,7 +36,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="测量时间"
+        android:text="@string/Measurement_time"
         android:textColor="#000000"
         android:textSize="15sp" />
 
@@ -47,7 +47,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="流量"
+        android:text="@string/flow"
         android:textColor="#000000"
         android:textSize="15sp" />
 
@@ -60,7 +60,7 @@
         <ImageView
             android:id="@+id/iv_modify"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="@dimen/y25"
             android:layout_centerInParent="true"
             android:layout_gravity="center"
             android:layout_weight="1"
@@ -70,7 +70,7 @@
         <ImageView
             android:id="@+id/iv_download"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="@dimen/y30"
             android:layout_centerInParent="true"
             android:layout_gravity="center"
             android:layout_weight="1"
